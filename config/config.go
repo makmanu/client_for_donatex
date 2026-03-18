@@ -2,12 +2,14 @@ package config
 
 import (
 	"os"
+
 	"gopkg.in/yaml.v3"
 )
 
 type Config struct {
 	URL   string `yaml:"url"`
 	Token string `yaml:"token"`
+	Port  int    `yaml:"port"`
 }
 
 func LoadConfig(filename string) (*Config, error) {

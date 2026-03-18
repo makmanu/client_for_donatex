@@ -91,7 +91,6 @@ func (c *Client) DoRequest(method, endpoint string, body interface{}, queryParam
 	return resp, nil
 }
 
-// Example method for getting donations
 func (c *Client) GetDonations(skip, take int, hideTest string) error {
 	queryParams := map[string]string{
 		"skip": fmt.Sprintf("%d", skip),
