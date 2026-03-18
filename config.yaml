@@ -1,3 +1,3 @@
 url: "https://donatex.gg/api/v1/"
-token: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiJhMWFlYjhjYy1hOTE1LTQ3NzYtOWNlYi0zYzJiOTgzN2I4MzIiLCJVc2VySWQiOiJkZTI4MjQ4Mi00ZDE2LTRhY2QtYWZkZC03ZjRhMDNiN2IxZWEiLCJVc2VybmFtZSI6Im1ha21hbnUiLCJpc3MiOiJodHRwczovL2RvbmF0ZXguZ2cvYXBpIiwiYXVkIjoiaHR0cHM6Ly9kb25hdGV4LmdnIn0.W2jZIPfiWbevqhrySqfZXx2MytziPycLW_yUGOA_Qvk"
+token: ""
 port: 3000
