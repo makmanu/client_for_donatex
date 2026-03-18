@@ -129,7 +129,7 @@ func (c *Client) GetDonations(skip, take int, hideTest string) error {
 	return nil
 }
 
-func (c *Client) TestDonations(amount int, username, message, currency string, withAiResponse bool) error {
+func (c *Client) TestDonations(amount float32, username, message, currency string, withAiResponse bool) error {
 	body := map[string]interface{}{
 		"amount":          amount,
 		"username":        username,

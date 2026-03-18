@@ -29,7 +29,7 @@ func main() {
 		return
 	}
 
-	err = c.TestDonations(10, "testuser", "test message", "RUB", false)
+	err = c.TestDonations(228, "mrHrunDell", "Проверка донатов)", "RUB", false)
 	if err != nil {
 		fmt.Println("Error:", err)
 		return
