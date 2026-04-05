@@ -1,0 +1,100 @@
+[2026-04-05T14:09:42+03:00] POST /webhook HTTP/2.0 from 172.19.29.173:38116
+Content-Type: application/json
+User-Agent: PostmanRuntime/7.52.0
+Accept: */*
+Postman-Token: e82543ec-10b7-466c-91f0-93805cf06075
+Accept-Encoding: gzip, deflate, br
+Content-Length: 114
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiJhMWFlYjhjYy1hOTE1LTQ3NzYtOWNlYi0zYzJiOTgzN2I4MzIiLCJVc2VySWQiOiJkZTI4MjQ4Mi00ZDE2LTRhY2QtYWZkZC03ZjRhMDNiN2IxZWEiLCJVc2VybmFtZSI6Im1ha21hbnUiLCJpc3MiOiJodHRwczovL2RvbmF0ZXguZ2cvYXBpIiwiYXVkIjoiaHR0cHM6Ly9kb25hdGV4LmdnIn0.W2jZIPfiWbevqhrySqfZXx2MytziPycLW_yUGOA_Qvk
+
+Body:
+{ "username": "mrHrunDell", "message": "ало yjvth 2", "amount": 50, "currency": "RUB", "withAIResponse": false}
+----
+[2026-04-05T14:09:54+03:00] POST /webhook HTTP/2.0 from 172.19.29.173:38116
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiJhMWFlYjhjYy1hOTE1LTQ3NzYtOWNlYi0zYzJiOTgzN2I4MzIiLCJVc2VySWQiOiJkZTI4MjQ4Mi00ZDE2LTRhY2QtYWZkZC03ZjRhMDNiN2IxZWEiLCJVc2VybmFtZSI6Im1ha21hbnUiLCJpc3MiOiJodHRwczovL2RvbmF0ZXguZ2cvYXBpIiwiYXVkIjoiaHR0cHM6Ly9kb25hdGV4LmdnIn0.W2jZIPfiWbevqhrySqfZXx2MytziPycLW_yUGOA_Qvk
+Content-Type: application/json
+User-Agent: PostmanRuntime/7.52.0
+Accept: */*
+Postman-Token: 669519c6-987f-4584-ad86-f8db518853b4
+Accept-Encoding: gzip, deflate, br
+Content-Length: 114
+
+Body:
+{ "username": "mrHrunDell", "message": "ало yjvth 2", "amount": 50, "currency": "RUB", "withAIResponse": false}
+----
+[2026-04-05T14:11:23+03:00] POST /webhook HTTP/1.1 from 172.19.29.173:55332
+X-Donatex-Event: DonationCreated
+X-Donatex-Subscription-Id: 4ffa1929-55c3-47b4-b930-02e0969ff70c
+X-Donatex-Signature: 694c113bd0c25d6401497d30879817b11f3df23b9e46c1a4ac027a8b9d4ac0fd
+X-Donatex-Client-Id: Client_1
+Content-Type: application/json; charset=utf-8
+Content-Length: 561
+
+Body:
+{"eventType":"DonationCreated","data":{"id":"16ced8e4-d32d-48ae-a0d2-e4b321a50659","username":"test2","message":"qweasdzxc","withAIResponse":false,"musicLink":"","currency":"RUB","amount":20.0,"amountInRub":20.0,"timestamp":"2026-04-05T11:11:20.4303324Z","aiResponse":"","wasShown":false,"isTest":false,"isPotentiallyUnsafe":false,"isFeePaidByUser":false,"voiceFilePath":"https://5348a03e-a26f-4a85-932c-2e67d0d23f98.selstorage.ru/default-donation-voices/16ced8e4-d32d-48ae-a0d2-e4b321a50659.mp3","paidVoice":""},"timestamp":"2026-04-05T11:11:20.8951572+00:00"}
+----
+[2026-04-05T14:11:23+03:00] POST /webhook HTTP/1.1 from 172.19.29.173:55338
+Content-Type: application/json; charset=utf-8
+Content-Length: 560
+X-Donatex-Event: DonationCreated
+X-Donatex-Subscription-Id: b9833529-6cd8-43e0-9067-a22af3fc6b71
+X-Donatex-Signature: e4db326034d5a3a71ed26aee8a8405814db4fe2c6b4d5c7bc705c8d349f1c155
+X-Donatex-Client-Id: Client_1
+
+Body:
+{"eventType":"DonationCreated","data":{"id":"16ced8e4-d32d-48ae-a0d2-e4b321a50659","username":"test2","message":"qweasdzxc","withAIResponse":false,"musicLink":"","currency":"RUB","amount":20.0,"amountInRub":20.0,"timestamp":"2026-04-05T11:11:20.4303324Z","aiResponse":"","wasShown":false,"isTest":false,"isPotentiallyUnsafe":false,"isFeePaidByUser":false,"voiceFilePath":"https://5348a03e-a26f-4a85-932c-2e67d0d23f98.selstorage.ru/default-donation-voices/16ced8e4-d32d-48ae-a0d2-e4b321a50659.mp3","paidVoice":""},"timestamp":"2026-04-05T11:11:20.895656+00:00"}
+----
+[2026-04-05T14:17:25+03:00] POST /webhook HTTP/2.0 from 172.19.29.173:44784
+Content-Length: 560
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiJhMWFlYjhjYy1hOTE1LTQ3NzYtOWNlYi0zYzJiOTgzN2I4MzIiLCJVc2VySWQiOiJkZTI4MjQ4Mi00ZDE2LTRhY2QtYWZkZC03ZjRhMDNiN2IxZWEiLCJVc2VybmFtZSI6Im1ha21hbnUiLCJpc3MiOiJodHRwczovL2RvbmF0ZXguZ2cvYXBpIiwiYXVkIjoiaHR0cHM6Ly9kb25hdGV4LmdnIn0.W2jZIPfiWbevqhrySqfZXx2MytziPycLW_yUGOA_Qvk
+X-Donatex-Signature: e4db326034d5a3a71ed26aee8a8405814db4fe2c6b4d5c7bc705c8d349f1c155
+X-Donatex-Client-Id: Client_1
+Content-Type: application/json
+Postman-Token: 4dcfaf5e-e2aa-4b33-93f5-a9f56da2ef47
+Accept-Encoding: gzip, deflate, br
+X-Donatex-Event: DonationCreated
+X-Donatex-Subscription-Id: b9833529-6cd8-43e0-9067-a22af3fc6b71
+User-Agent: PostmanRuntime/7.52.0
+Accept: */*
+
+Body:
+{"eventType":"DonationCreated","data":{"id":"16ced8e4-d32d-48ae-a0d2-e4b321a50659","username":"test2","message":"qweasdzxc","withAIResponse":false,"musicLink":"","currency":"RUB","amount":20.0,"amountInRub":20.0,"timestamp":"2026-04-05T11:11:20.4303324Z","aiResponse":"","wasShown":false,"isTest":false,"isPotentiallyUnsafe":false,"isFeePaidByUser":false,"voiceFilePath":"https://5348a03e-a26f-4a85-932c-2e67d0d23f98.selstorage.ru/default-donation-voices/16ced8e4-d32d-48ae-a0d2-e4b321a50659.mp3","paidVoice":""},"timestamp":"2026-04-05T11:11:20.895656+00:00"}
+----
+[2026-04-05T14:19:46+03:00] POST /webhook HTTP/2.0 from 172.19.29.173:49196
+X-Donatex-Client-Id: Client_1
+Content-Type: application/json
+User-Agent: PostmanRuntime/7.52.0
+Accept: */*
+Postman-Token: e619cadd-578d-411d-968e-28fddc45d6c9
+Content-Length: 571
+X-Donatex-Event: DonationCreated
+X-Donatex-Subscription-Id: b9833529-6cd8-43e0-9067-a22af3fc6b71
+Accept-Encoding: gzip, deflate, br
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiJhMWFlYjhjYy1hOTE1LTQ3NzYtOWNlYi0zYzJiOTgzN2I4MzIiLCJVc2VySWQiOiJkZTI4MjQ4Mi00ZDE2LTRhY2QtYWZkZC03ZjRhMDNiN2IxZWEiLCJVc2VybmFtZSI6Im1ha21hbnUiLCJpc3MiOiJodHRwczovL2RvbmF0ZXguZ2cvYXBpIiwiYXVkIjoiaHR0cHM6Ly9kb25hdGV4LmdnIn0.W2jZIPfiWbevqhrySqfZXx2MytziPycLW_yUGOA_Qvk
+X-Donatex-Signature: e4db326034d5a3a71ed26aee8a8405814db4fe2c6b4d5c7bc705c8d349f1c155
+
+Body:
+{"eventType":"DonationCreated","data":{"id":"16ced8e4-d32d-48ae-a0d2-e4b321a50659","username":"makmanu","message":"#03$3600 srokgjsiodgjosie","withAIResponse":false,"musicLink":"","currency":"RUB","amount":200.0,"amountInRub":200.0,"timestamp":"2026-04-05T11:11:20.4303324Z","aiResponse":"","wasShown":false,"isTest":false,"isPotentiallyUnsafe":false,"isFeePaidByUser":false,"voiceFilePath":"https://5348a03e-a26f-4a85-932c-2e67d0d23f98.selstorage.ru/default-donation-voices/16ced8e4-d32d-48ae-a0d2-e4b321a50659.mp3","paidVoice":""},"timestamp":"2026-04-05T11:11:20.895656+00:00"}
+----
+[2026-04-05T14:28:02+03:00] POST /webhook HTTP/1.1 from 172.19.29.173:57530
+X-Donatex-Event: DonationCreated
+X-Donatex-Subscription-Id: 4ffa1929-55c3-47b4-b930-02e0969ff70c
+X-Donatex-Signature: 0cf7c73800ca116c8733050d0c521bb8b08b19ffd9d7dafe590fb7b724a15347
+X-Donatex-Client-Id: Client_1
+Content-Type: application/json; charset=utf-8
+Content-Length: 554
+
+Body:
+{"eventType":"DonationCreated","data":{"id":"4493e5af-ebd4-4d39-ac43-6d33092e117e","username":"test2","message":"","withAIResponse":false,"musicLink":"","currency":"RUB","amount":20.03,"amountInRub":20.03,"timestamp":"2026-04-05T11:28:00.0450086Z","aiResponse":"","wasShown":false,"isTest":false,"isPotentiallyUnsafe":false,"isFeePaidByUser":false,"voiceFilePath":"https://5348a03e-a26f-4a85-932c-2e67d0d23f98.selstorage.ru/default-donation-voices/4493e5af-ebd4-4d39-ac43-6d33092e117e.mp3","paidVoice":""},"timestamp":"2026-04-05T11:28:00.0948411+00:00"}
+----
+[2026-04-05T14:28:02+03:00] POST /webhook HTTP/1.1 from 172.19.29.173:57540
+X-Donatex-Event: DonationCreated
+X-Donatex-Subscription-Id: b9833529-6cd8-43e0-9067-a22af3fc6b71
+X-Donatex-Signature: 20ffd716a14c7d740bcce9d605a29ee88a32ad797e3e0e75345ce87bfbfa566a
+X-Donatex-Client-Id: Client_1
+Content-Type: application/json; charset=utf-8
+Content-Length: 554
+
+Body:
+{"eventType":"DonationCreated","data":{"id":"4493e5af-ebd4-4d39-ac43-6d33092e117e","username":"test2","message":"","withAIResponse":false,"musicLink":"","currency":"RUB","amount":20.03,"amountInRub":20.03,"timestamp":"2026-04-05T11:28:00.0450086Z","aiResponse":"","wasShown":false,"isTest":false,"isPotentiallyUnsafe":false,"isFeePaidByUser":false,"voiceFilePath":"https://5348a03e-a26f-4a85-932c-2e67d0d23f98.selstorage.ru/default-donation-voices/4493e5af-ebd4-4d39-ac43-6d33092e117e.mp3","paidVoice":""},"timestamp":"2026-04-05T11:28:00.0949989+00:00"}
+----

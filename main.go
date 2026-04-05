@@ -18,10 +18,15 @@ func main() {
 		log.Fatalf("Failed to load config: %v", err)
 	}
 
-	fmt.Printf("Loaded config: URL=%s, Token=%s, Port=%d\n", cfg.URL, cfg.Token, cfg.Port)
+	secret, err := config.LoadSecret("secret.yaml")
+	if err != nil {
+		log.Fatalf("Failed to load secret: %v", err)
+	}
+
+	fmt.Printf("Loaded config: URL=%s, Token=%s, Port=%d\n", cfg.URL, secret.Token, cfg.Port)
 
 	// Initialize the client
-	c := client.NewClient(cfg.URL, cfg.Token)
+	c := client.NewClient(cfg.URL, secret.Token)
 
 	// Start the listener
 	go listener.StartListener(cfg)
@@ -33,11 +38,18 @@ func main() {
 		return
 	}
 
-	err = c.TestDonations(228, "mrHrunDell", "Проверка донатов)", "RUB", false)
+	/*err = c.TestDonations(228, "mrHrunDell", "Проверка донатов)", "RUB", false)
+	if err != nil {
+		fmt.Println("Error:", err)
+		return
+	}*/
+
+	/*webhook, err := c.CreateWebhook("https://makmanu.com:3000/webhook", "DonationCreated", "Client_1", secret.WebhookSecret)
 	if err != nil {
 		fmt.Println("Error:", err)
 		return
 	}
+	fmt.Printf("Created webhook: %+v\n", webhook)*/
 
 	// Keep the program running
 	select {}

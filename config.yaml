@@ -1,3 +1,5 @@
 url: "https://donatex.gg/api/v1/"
-token: ""
 port: 3000
+certFile: "makmanu.com/fullchain.pem"
+keyFile: "makmanu.com/privkey.pem"
+logFile: "webhook.log"

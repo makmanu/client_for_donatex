@@ -15,22 +15,28 @@ type Client struct {
 }
 
 type Donation struct {
-	ID                string  `json:"id"`
-	Username          string  `json:"username"`
-	Message           string  `json:"message"`
-	Currency          string  `json:"currency"`
-	Amount            float64 `json:"amount"`
-	AmountInRub       float64 `json:"amountInRub"`
-	Timestamp         string  `json:"timestamp"`
-	WithAiResponse    bool    `json:"withAiResponse"`
-	AiResponse        string  `json:"aiResponse"`
-	IsTest            bool    `json:"isTest"`
-	IsPotentiallyUnsafe bool  `json:"isPotentiallyUnsafe"`
-	WasShown          bool    `json:"wasShown"`
-	IsFeePaidByUser   bool    `json:"isFeePaidByUser"`
-	VoiceFilePath     string  `json:"voiceFilePath"`
-	PaidVoice         string `json:"paidVoice"`
-	MusicLink         string  `json:"musicLink"`
+	ID                  string  `json:"id"`
+	Username            string  `json:"username"`
+	Message             string  `json:"message"`
+	Currency            string  `json:"currency"`
+	Amount              float64 `json:"amount"`
+	AmountInRub         float64 `json:"amountInRub"`
+	Timestamp           string  `json:"timestamp"`
+	WithAiResponse      bool    `json:"withAiResponse"`
+	AiResponse          string  `json:"aiResponse"`
+	IsTest              bool    `json:"isTest"`
+	IsPotentiallyUnsafe bool    `json:"isPotentiallyUnsafe"`
+	WasShown            bool    `json:"wasShown"`
+	IsFeePaidByUser     bool    `json:"isFeePaidByUser"`
+	VoiceFilePath       string  `json:"voiceFilePath"`
+	PaidVoice           string  `json:"paidVoice"`
+	MusicLink           string  `json:"musicLink"`
+}
+
+type WebhookPayload struct {
+	EventType string   `json:"eventType"`
+	Data      Donation `json:"data"`
+	Timestamp string   `json:"timestamp"`
 }
 
 func NewClient(baseURL, apiKey string) *Client {
@@ -93,8 +99,8 @@ func (c *Client) DoRequest(method, endpoint string, body interface{}, queryParam
 
 func (c *Client) GetDonations(skip, take int, hideTest string) error {
 	queryParams := map[string]string{
-		"skip": fmt.Sprintf("%d", skip),
-		"take": fmt.Sprintf("%d", take),
+		"skip":     fmt.Sprintf("%d", skip),
+		"take":     fmt.Sprintf("%d", take),
 		"hideTest": hideTest,
 	}
 
@@ -130,11 +136,11 @@ func (c *Client) GetDonations(skip, take int, hideTest string) error {
 
 func (c *Client) TestDonations(amount float32, username, message, currency string, withAiResponse bool) error {
 	body := map[string]interface{}{
-		"amount":          amount,
-		"username":        username,
-		"message":         message,
-		"currency":        currency,
-		"withAiResponse":  withAiResponse,
+		"amount":         amount,
+		"username":       username,
+		"message":        message,
+		"currency":       currency,
+		"withAiResponse": withAiResponse,
 	}
 
 	resp, err := c.DoRequest("POST", "test-donation", body, nil)

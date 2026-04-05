@@ -7,9 +7,16 @@ import (
 )
 
 type Config struct {
-	URL   string `yaml:"url"`
-	Token string `yaml:"token"`
-	Port  int    `yaml:"port"`
+	URL      string `yaml:"url"`
+	Port     int    `yaml:"port"`
+	CertFile string `yaml:"certFile"`
+	KeyFile  string `yaml:"keyFile"`
+	LogFile  string `yaml:"logFile"`
+}
+
+type Secret struct {
+	Token         string `yaml:"token"`
+	WebhookSecret string `yaml:"webhookSecret"`
 }
 
 func LoadConfig(filename string) (*Config, error) {
@@ -25,4 +32,19 @@ func LoadConfig(filename string) (*Config, error) {
 	}
 
 	return &config, nil
+}
+
+func LoadSecret(filename string) (*Secret, error) {
+	data, err := os.ReadFile(filename)
+	if err != nil {
+		return nil, err
+	}
+
+	var secret Secret
+	err = yaml.Unmarshal(data, &secret)
+	if err != nil {
+		return nil, err
+	}
+
+	return &secret, nil
 }

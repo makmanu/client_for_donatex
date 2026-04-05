@@ -19,17 +19,19 @@ type Webhook struct {
 func (c *Client) CreateWebhook(webhookURL, eventType, clientId, secret string) (*Webhook, error) {
 	body := map[string]string{
 		"url":       webhookURL,
+		"secret":    secret,
 		"eventType": eventType,
 		"clientId":  clientId,
-		"secret":    secret,
 	}
-	resp, err := c.DoRequest("POST", "/webhooks", body, nil)
+	resp, err := c.DoRequest("POST", "webhooks/subscriptions", body, nil)
 	if err != nil {
 		return nil, err
 	}
 	defer resp.Body.Close()
 
 	if resp.StatusCode != http.StatusOK {
+		bodyBytes, _ := io.ReadAll(resp.Body)
+		fmt.Printf("Webhook creation failed. Status: %s, Body: %s\n", resp.Status, string(bodyBytes))
 		return nil, fmt.Errorf("API request failed with status: %s", resp.Status)
 	}
 
