@@ -3,3 +3,7 @@ port: 3000
 certFile: "makmanu.com/fullchain.pem"
 keyFile: "makmanu.com/privkey.pem"
 logFile: "webhook.log"
+VTubeStudio:
+  port: 14141
+  url: "ws://192.168.1.37"
+  pluginName: "DonatexWebhook"

@@ -6,12 +6,19 @@ import (
 	"gopkg.in/yaml.v3"
 )
 
+type VTubeStudioConfig struct {
+	URL        string `yaml:"url"`
+	Port       int    `yaml:"port"`
+	PluginName string `yaml:"pluginName"`
+}
+
 type Config struct {
-	URL      string `yaml:"url"`
-	Port     int    `yaml:"port"`
-	CertFile string `yaml:"certFile"`
-	KeyFile  string `yaml:"keyFile"`
-	LogFile  string `yaml:"logFile"`
+	URL         string            `yaml:"url"`
+	Port        int               `yaml:"port"`
+	CertFile    string            `yaml:"certFile"`
+	KeyFile     string            `yaml:"keyFile"`
+	LogFile     string            `yaml:"logFile"`
+	VTubeStudio VTubeStudioConfig `yaml:"VTubeStudio"`
 }
 
 type Secret struct {

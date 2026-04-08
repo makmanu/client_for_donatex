@@ -7,6 +7,7 @@ import (
 	"github.com/makmanu/client_for_donatex/client"
 	"github.com/makmanu/client_for_donatex/config"
 	"github.com/makmanu/client_for_donatex/listener"
+	"github.com/makmanu/client_for_donatex/plugin"
 )
 
 func main() {
@@ -28,6 +29,19 @@ func main() {
 	// Initialize the client
 	c := client.NewClient(cfg.URL, secret.Token)
 
+	pluginConn, err := plugin.ConnectPluginWebsocket(cfg)
+	if err != nil {
+		log.Fatalf("Failed to connect to VTube Studio plugin websocket: %v", err)
+	}
+	defer pluginConn.Close()
+	fmt.Println("Connected to VTube Studio plugin websocket")
+
+	err = plugin.AuthPlugin(pluginConn, cfg)
+	if err != nil {
+		log.Fatalf("Failed to authenticate with VTube Studio plugin: %v", err)
+	}
+	fmt.Println("Authenticated with VTube Studio plugin")
+	
 	// Start the listener
 	go listener.StartListener(cfg)
 

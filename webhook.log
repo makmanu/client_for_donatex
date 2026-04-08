@@ -98,3 +98,69 @@ Content-Length: 554
 Body:
 {"eventType":"DonationCreated","data":{"id":"4493e5af-ebd4-4d39-ac43-6d33092e117e","username":"test2","message":"","withAIResponse":false,"musicLink":"","currency":"RUB","amount":20.03,"amountInRub":20.03,"timestamp":"2026-04-05T11:28:00.0450086Z","aiResponse":"","wasShown":false,"isTest":false,"isPotentiallyUnsafe":false,"isFeePaidByUser":false,"voiceFilePath":"https://5348a03e-a26f-4a85-932c-2e67d0d23f98.selstorage.ru/default-donation-voices/4493e5af-ebd4-4d39-ac43-6d33092e117e.mp3","paidVoice":""},"timestamp":"2026-04-05T11:28:00.0949989+00:00"}
 ----
+[2026-04-05T15:14:25+03:00] POST /webhook HTTP/1.1 from 172.19.29.173:38764
+X-Donatex-Event: DonationCreated
+X-Donatex-Subscription-Id: b9833529-6cd8-43e0-9067-a22af3fc6b71
+X-Donatex-Signature: 029c3db7f2916e518a8dd8cb8e4b822cffeb474569772cc961fb740e77b3c49d
+X-Donatex-Client-Id: Client_1
+Content-Type: application/json; charset=utf-8
+Content-Length: 560
+
+Body:
+{"eventType":"DonationCreated","data":{"id":"4c3b3582-7b1b-4ec3-af70-9dd7e2279e33","username":"mrHrunDell","message":"","withAIResponse":false,"musicLink":"","currency":"KZT","amount":1000.0,"amountInRub":169.20,"timestamp":"2026-04-05T12:14:22.7779613Z","aiResponse":"","wasShown":false,"isTest":false,"isPotentiallyUnsafe":false,"isFeePaidByUser":false,"voiceFilePath":"https://5348a03e-a26f-4a85-932c-2e67d0d23f98.selstorage.ru/default-donation-voices/4c3b3582-7b1b-4ec3-af70-9dd7e2279e33.mp3","paidVoice":""},"timestamp":"2026-04-05T12:14:22.826157+00:00"}
+----
+[2026-04-05T15:14:25+03:00] POST /webhook HTTP/1.1 from 172.19.29.173:38776
+X-Donatex-Subscription-Id: 4ffa1929-55c3-47b4-b930-02e0969ff70c
+X-Donatex-Signature: 3bfd5cd7b05330f986f785a14d3f2f5de4cc60b5fa0b104f04511acb9537021b
+X-Donatex-Client-Id: Client_1
+Content-Type: application/json; charset=utf-8
+Content-Length: 561
+X-Donatex-Event: DonationCreated
+
+Body:
+{"eventType":"DonationCreated","data":{"id":"4c3b3582-7b1b-4ec3-af70-9dd7e2279e33","username":"mrHrunDell","message":"","withAIResponse":false,"musicLink":"","currency":"KZT","amount":1000.0,"amountInRub":169.20,"timestamp":"2026-04-05T12:14:22.7779613Z","aiResponse":"","wasShown":false,"isTest":false,"isPotentiallyUnsafe":false,"isFeePaidByUser":false,"voiceFilePath":"https://5348a03e-a26f-4a85-932c-2e67d0d23f98.selstorage.ru/default-donation-voices/4c3b3582-7b1b-4ec3-af70-9dd7e2279e33.mp3","paidVoice":""},"timestamp":"2026-04-05T12:14:22.8254891+00:00"}
+----
+[2026-04-05T15:16:26+03:00] POST /webhook HTTP/1.1 from 172.19.29.173:54588
+Content-Type: application/json; charset=utf-8
+Content-Length: 557
+X-Donatex-Event: DonationCreated
+X-Donatex-Subscription-Id: b9833529-6cd8-43e0-9067-a22af3fc6b71
+X-Donatex-Signature: 2807a975f8a86b16190d223009a4ee44476af94c86a7addf9905ef09aeacfd43
+X-Donatex-Client-Id: Client_1
+
+Body:
+{"eventType":"DonationCreated","data":{"id":"b8768eac-d124-4c88-bace-82abcb337ac4","username":"mrHrunDell","message":"","withAIResponse":false,"musicLink":"","currency":"USD","amount":1.25,"amountInRub":100.0,"timestamp":"2026-04-05T12:16:24.1772552Z","aiResponse":"","wasShown":false,"isTest":false,"isPotentiallyUnsafe":false,"isFeePaidByUser":true,"voiceFilePath":"https://5348a03e-a26f-4a85-932c-2e67d0d23f98.selstorage.ru/default-donation-voices/b8768eac-d124-4c88-bace-82abcb337ac4.mp3","paidVoice":""},"timestamp":"2026-04-05T12:16:24.2179828+00:00"}
+----
+[2026-04-05T15:16:27+03:00] POST /webhook HTTP/1.1 from 172.19.29.173:54590
+X-Donatex-Signature: cf02dcbbd0ecafacd14669d5577f0c5266fe115eb152b440a88fd9effb769ddf
+X-Donatex-Client-Id: Client_1
+Content-Type: application/json; charset=utf-8
+Content-Length: 557
+X-Donatex-Event: DonationCreated
+X-Donatex-Subscription-Id: 4ffa1929-55c3-47b4-b930-02e0969ff70c
+
+Body:
+{"eventType":"DonationCreated","data":{"id":"b8768eac-d124-4c88-bace-82abcb337ac4","username":"mrHrunDell","message":"","withAIResponse":false,"musicLink":"","currency":"USD","amount":1.25,"amountInRub":100.0,"timestamp":"2026-04-05T12:16:24.1772552Z","aiResponse":"","wasShown":false,"isTest":false,"isPotentiallyUnsafe":false,"isFeePaidByUser":true,"voiceFilePath":"https://5348a03e-a26f-4a85-932c-2e67d0d23f98.selstorage.ru/default-donation-voices/b8768eac-d124-4c88-bace-82abcb337ac4.mp3","paidVoice":""},"timestamp":"2026-04-05T12:16:24.2176634+00:00"}
+----
+[2026-04-05T15:21:45+03:00] POST /webhook HTTP/1.1 from 172.19.29.173:55892
+X-Donatex-Client-Id: Client_1
+Content-Type: application/json; charset=utf-8
+Content-Length: 706
+X-Donatex-Event: DonationCreated
+X-Donatex-Subscription-Id: 4ffa1929-55c3-47b4-b930-02e0969ff70c
+X-Donatex-Signature: e6028553896cedb2a8d9ec6f91ec9f73d0988e0157b84b196031e5a660fa700e
+
+Body:
+{"eventType":"DonationCreated","data":{"id":"1a97f611-e373-45a2-90f5-9c45bb9ad615","username":"mrHrunDell","message":"\u0442\u0435\u0441\u0442 \u0431\u0435\u0437 \u0433\u0430\u043B\u043E\u0447\u043A\u0438 \u043D\u0430 \u043A\u043E\u043C\u0438\u0441\u0441\u0438\u044E","withAIResponse":false,"musicLink":"","currency":"USD","amount":1.25,"amountInRub":100.0,"timestamp":"2026-04-05T12:21:42.0994469Z","aiResponse":"","wasShown":false,"isTest":false,"isPotentiallyUnsafe":false,"isFeePaidByUser":false,"voiceFilePath":"https://5348a03e-a26f-4a85-932c-2e67d0d23f98.selstorage.ru/default-donation-voices/1a97f611-e373-45a2-90f5-9c45bb9ad615.mp3","paidVoice":""},"timestamp":"2026-04-05T12:21:42.4496318+00:00"}
+----
+[2026-04-05T15:21:45+03:00] POST /webhook HTTP/1.1 from 172.19.29.173:55892
+Content-Length: 706
+X-Donatex-Event: DonationCreated
+X-Donatex-Subscription-Id: b9833529-6cd8-43e0-9067-a22af3fc6b71
+X-Donatex-Signature: 463d0fc87680dd5c29783fc73e2be041b52b9322551f4b97c0f34dc7b25d4753
+X-Donatex-Client-Id: Client_1
+Content-Type: application/json; charset=utf-8
+
+Body:
+{"eventType":"DonationCreated","data":{"id":"1a97f611-e373-45a2-90f5-9c45bb9ad615","username":"mrHrunDell","message":"\u0442\u0435\u0441\u0442 \u0431\u0435\u0437 \u0433\u0430\u043B\u043E\u0447\u043A\u0438 \u043D\u0430 \u043A\u043E\u043C\u0438\u0441\u0441\u0438\u044E","withAIResponse":false,"musicLink":"","currency":"USD","amount":1.25,"amountInRub":100.0,"timestamp":"2026-04-05T12:21:42.0994469Z","aiResponse":"","wasShown":false,"isTest":false,"isPotentiallyUnsafe":false,"isFeePaidByUser":false,"voiceFilePath":"https://5348a03e-a26f-4a85-932c-2e67d0d23f98.selstorage.ru/default-donation-voices/1a97f611-e373-45a2-90f5-9c45bb9ad615.mp3","paidVoice":""},"timestamp":"2026-04-05T12:21:42.4501336+00:00"}
+----
