@@ -5,6 +5,7 @@ createTunnel.sh
 secret.yaml
 makmanu.*
 token
+hotkeys.yaml
 
 # Binaries for programs and plugins
 *.exe

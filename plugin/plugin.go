@@ -8,6 +8,7 @@ import (
 
 	"github.com/gorilla/websocket"
 	"github.com/makmanu/client_for_donatex/config"
+	"gopkg.in/yaml.v3"
 )
 
 func ConnectPluginWebsocket(cfg *config.Config) (*websocket.Conn, error) {
@@ -103,6 +104,10 @@ func GetAuthToken(conn *websocket.Conn) error {
 	}
 }
  func SessionAuthPlugin(conn *websocket.Conn) error {
+	if conn == nil {
+		return fmt.Errorf("websocket connection must not be nil")
+	}
+	
 	tokenBytes, err := os.ReadFile("plugin/token")
 	if err != nil {
 		return fmt.Errorf("failed to read auth token: %w", err)
@@ -151,4 +156,79 @@ func GetAuthToken(conn *websocket.Conn) error {
 
 	}
 	return fmt.Errorf("unexpected session auth response messageType: %s", resp.MessageType)
+}
+
+func GetCurrentHotkeys(conn *websocket.Conn) error {
+	if conn == nil {
+		return fmt.Errorf("websocket connection must not be nil")
+	}
+
+	req := map[string]any{
+		"apiName":     "VTubeStudioPublicAPI",
+		"apiVersion":  "1.0",
+		"requestID":   fmt.Sprintf("hotkeys-%d", time.Now().UnixNano()),
+		"messageType": "HotkeysInCurrentModelRequest",
+	}
+
+	if err := conn.WriteJSON(req); err != nil {
+		return fmt.Errorf("failed to send hotkeys request: %w", err)
+	}
+
+	var resp struct {
+		RequestID   string                 `json:"requestID"`
+		MessageType string                 `json:"messageType"`
+		Data        map[string]interface{} `json:"data"`
+	}
+	if err := conn.ReadJSON(&resp); err != nil {
+		return fmt.Errorf("failed to read hotkeys response: %w", err)
+	}
+
+	if resp.MessageType != "HotkeysInCurrentModelResponse" {
+		return fmt.Errorf("unexpected response type: %s", resp.MessageType)
+	}
+
+	// Read coefficients from file
+	coeffData, err := os.ReadFile("plugin/coefficient.yaml")
+	if err != nil {
+		coeffData = []byte{}
+	}
+
+	var coefficients map[interface{}]interface{}
+	if len(coeffData) > 0 {
+		if err := yaml.Unmarshal(coeffData, &coefficients); err != nil {
+			coefficients = make(map[interface{}]interface{})
+		}
+	} else {
+		coefficients = make(map[interface{}]interface{})
+	}
+
+	// Add ID and coefficient to each hotkey
+	if hotkeys, ok := resp.Data["availableHotkeys"].([]interface{}); ok {
+		for i, hotkey := range hotkeys {
+			if hotkeyMap, ok := hotkey.(map[string]interface{}); ok {
+				id := i + 1
+				hotkeyMap["id"] = id
+
+				// Look up coefficient or use default
+				coeff := 2.5
+				if val, ok := coefficients["coefficients"].(map[any]any)[id]; ok {
+					if f, ok := val.(float64); ok {
+						coeff = f
+					}
+				}
+				hotkeyMap["coefficient"] = coeff
+			}
+		}
+	}
+
+	yamlData, err := yaml.Marshal(resp.Data)
+	if err != nil {
+		return fmt.Errorf("failed to marshal response to yaml: %w", err)
+	}
+
+	if err := os.WriteFile("plugin/hotkeys.yaml", yamlData, 0644); err != nil {
+		return fmt.Errorf("failed to write hotkeys to file: %w", err)
+	}
+
+	return nil
 }

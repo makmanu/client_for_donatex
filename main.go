@@ -52,6 +52,15 @@ func main() {
 		return
 	}
 
+	fmt.Println("Getting current hotkeys from VTube Studio...")
+	err = plugin.GetCurrentHotkeys(pluginConn)
+	if err != nil {
+		fmt.Println("Error:", err)
+		return
+	} else {
+		fmt.Println("Successfully retrieved current hotkeys from VTube Studio and saved to file plugin/hotkeys.yaml")
+	}
+
 	/*err = c.TestDonations(228, "mrHrunDell", "Проверка донатов)", "RUB", false)
 	if err != nil {
 		fmt.Println("Error:", err)
