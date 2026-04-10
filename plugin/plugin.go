@@ -23,18 +23,12 @@ func ConnectPluginWebsocket(cfg *config.Config) (*websocket.Conn, error) {
 	return conn, nil
 }
 
-func AuthPlugin(conn *websocket.Conn, cfg *config.Config) error {
+func GetAuthToken(conn *websocket.Conn) error {
 	if conn == nil {
 		return fmt.Errorf("websocket connection must not be nil")
 	}
-	if cfg == nil {
-		return fmt.Errorf("config must not be nil")
-	}
 
-	pluginName := cfg.VTubeStudio.PluginName
-	if pluginName == "" {
-		pluginName = "Donatex_plugin"
-	}
+	pluginName := "DonatexPlugin"
 
 	iconBytes, err := os.ReadFile("plugin/base64_plugin_logo.txt")
 	if err != nil {
@@ -85,7 +79,7 @@ func AuthPlugin(conn *websocket.Conn, cfg *config.Config) error {
 		if err := os.WriteFile("plugin/token", []byte(authToken), 0o600); err != nil {
 			return fmt.Errorf("failed to save auth token: %w", err)
 		}
-		return nil
+		return SessionAuthPlugin(conn)
 
 	case "APIError":
 		if resp.Data != nil {
@@ -107,4 +101,54 @@ func AuthPlugin(conn *websocket.Conn, cfg *config.Config) error {
 	default:
 		return fmt.Errorf("unexpected auth response messageType: %s", resp.MessageType)
 	}
+}
+ func SessionAuthPlugin(conn *websocket.Conn) error {
+	tokenBytes, err := os.ReadFile("plugin/token")
+	if err != nil {
+		return fmt.Errorf("failed to read auth token: %w", err)
+	}
+	token := strings.TrimSpace(string(tokenBytes))
+	if token == "" {
+		return fmt.Errorf("auth token file is empty")
+	}
+
+	pluginName := "DonatexPlugin"
+
+	req := map[string]any{
+		"apiName":     "VTubeStudioPublicAPI",
+		"apiVersion":  "1.0",
+		"requestID":   fmt.Sprintf("session-auth-%d", time.Now().UnixNano()),
+		"messageType": "AuthenticationRequest",
+		"data": map[string]any{
+			"pluginName":      pluginName,
+			"pluginDeveloper": "Makmanu",
+			"authenticationToken": token,
+		},
+	}
+	if err := conn.WriteJSON(req); err != nil {
+		return fmt.Errorf("failed to send session auth request: %w", err)
+	}
+
+	var resp struct {
+		MessageType string                 `json:"messageType"`
+		Data        map[string]interface{} `json:"data"`
+	}
+	if err := conn.ReadJSON(&resp); err != nil {
+		return fmt.Errorf("failed to read session auth response: %w", err)
+	}
+	
+	switch resp.MessageType {
+	case "AuthenticationResponse":
+		if resp.Data != nil {
+			if authenticated, ok := resp.Data["authenticated"]; !ok || !authenticated.(bool) {
+				fmt.Print(ok, authenticated, "3\n")
+				fmt.Printf("Session authentication failed: %v\n Trying to get new auth token...\n", resp.Data)
+				return GetAuthToken(conn)
+			}
+			return nil
+		}
+		return fmt.Errorf("session auth response missing data")
+
+	}
+	return fmt.Errorf("unexpected session auth response messageType: %s", resp.MessageType)
 }

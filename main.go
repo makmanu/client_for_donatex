@@ -36,7 +36,7 @@ func main() {
 	defer pluginConn.Close()
 	fmt.Println("Connected to VTube Studio plugin websocket")
 
-	err = plugin.AuthPlugin(pluginConn, cfg)
+	err = plugin.SessionAuthPlugin(pluginConn)
 	if err != nil {
 		log.Fatalf("Failed to authenticate with VTube Studio plugin: %v", err)
 	}
