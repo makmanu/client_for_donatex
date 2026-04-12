@@ -42,6 +42,7 @@ var (
 	pendingMu        sync.Mutex
 	workersOnce      sync.Once
 	conn             *websocket.Conn
+	hotkeysResp      HotkeysResponse
 )
 
 func startWsWorkers() {
@@ -333,6 +334,10 @@ func GetCurrentHotkeys() error {
 		return fmt.Errorf("failed to marshal response to yaml: %w", err)
 	}
 
+	if err := yaml.Unmarshal(yamlData, &hotkeysResp); err != nil {
+		return fmt.Errorf("failed to unmarshal yaml data: %w", err)
+	}
+
 	if err := os.WriteFile("plugin/hotkeys.yaml", yamlData, 0644); err != nil {
 		return fmt.Errorf("failed to write hotkeys to file: %w", err)
 	}
@@ -351,24 +356,17 @@ func ExecuteHotkey(identifier string) error {
 		return fmt.Errorf("failed to read hotkeys.yaml: %w", err)
 	}
 
-	var hotkeysResp HotkeysResponse
+	
 	if err := yaml.Unmarshal(yamlData, &hotkeysResp); err != nil {
 		return fmt.Errorf("failed to unmarshal hotkeys.yaml: %w", err)
 	}
 
 	// Find the hotkey by id or name
-	var targetHotkeyID string
-	found := false
-	for _, hotkey := range hotkeysResp.AvailableHotkeys {
-		if strconv.Itoa(hotkey.ID) == identifier || hotkey.Name == identifier {
-			targetHotkeyID = hotkey.HotkeyID
-			found = true
-			break
-		}
+	targetHotkey, err := FindHotkeyInfoByIdentifier(identifier)
+	if err != nil {
+		return err
 	}
-	if !found {
-		return fmt.Errorf("hotkey with identifier '%s' not found", identifier)
-	}
+	targetHotkeyID := targetHotkey.HotkeyID
 
 	req := map[string]any{
 		"apiName":     "VTubeStudioPublicAPI",
@@ -380,7 +378,7 @@ func ExecuteHotkey(identifier string) error {
 		},
 	}
 
-	fmt.Printf("Sending hotkey trigger request: %s, %s, %s, %s, %v\n", req["apiName"], req["apiVersion"], req["requestID"], req["messageType"], req["data"])
+	log.Printf("Sending hotkey trigger request: %s, %s, %s, %s, %v\n", req["apiName"], req["apiVersion"], req["requestID"], req["messageType"], req["data"])
 
 	res, err := sendWebsocketRequest(req)
 	if err != nil {
@@ -393,3 +391,19 @@ func ExecuteHotkey(identifier string) error {
 
 	return nil
 }
+
+func FindHotkeyInfoByIdentifier(identifier string) (Hotkey, error) {
+	found := false
+	targetHotkey := Hotkey{}
+	for _, hotkey := range hotkeysResp.AvailableHotkeys {
+		if strconv.Itoa(hotkey.ID) == identifier || hotkey.Name == identifier {
+			targetHotkey = hotkey
+			found = true
+			break
+		}
+	}
+	if !found {
+		return Hotkey{}, fmt.Errorf("hotkey with identifier '%s' not found", identifier)
+	}
+	return targetHotkey, nil
+ }

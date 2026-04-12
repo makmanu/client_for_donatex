@@ -72,7 +72,7 @@ func main() {
 		fmt.Println("Successfully retrieved current hotkeys from VTube Studio and saved to file plugin/hotkeys.yaml")
 	}
 
-	fmt.Print("Starting planner...")
+	fmt.Print("Starting planner...\n")
 	planner := planner.NewPlanner(cfg.MinimumDuration)
 	go planner.Start()
 

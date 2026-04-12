@@ -17,7 +17,7 @@ type Config struct {
 	Port            int               `yaml:"port"`
 	LogFile         string            `yaml:"logFile"`
 	VTubeStudio     VTubeStudioConfig `yaml:"VTubeStudio"`
-	MinimumDuration float64           `yaml:"minimumDuration"`
+	MinimumDuration int           `yaml:"minimumDuration"`
 }
 
 type Secret struct {
