@@ -2,13 +2,17 @@ package console
 
 import (
 	"bufio"
+	"crypto/hmac"
+	"crypto/sha256"
+	"encoding/hex"
 	"fmt"
 	"os"
+	"strconv"
 	"strings"
 
 	"github.com/gorilla/websocket"
-	"github.com/makmanu/client_for_donatex/plugin"
 	"github.com/makmanu/client_for_donatex/client"
+	"github.com/makmanu/client_for_donatex/plugin"
 )
 
 // Start begins the interactive console prompt
@@ -17,12 +21,14 @@ func Start(conn *websocket.Conn, exitChan chan struct{}, c *client.Client) {
 
 	help_text := `=== Client_for_Donatex Console ===
 Commands:
-  createwebhook      - Create a new webhook subscription
-  getwebhooks        - List all registered webhooks
-  update             - Update current hotkeys from VTube Studio
-  execute <id|name>  - Execute a hotkey by ID or name
-  help               - Show this help message
-  exit               - Exit console
+  deletewebhook <id>                    - Delete a webhook subscription by ID
+  createwebhook                         - Create a new webhook subscription
+  getwebhooks                           - List all registered webhooks
+  getdonations <skip> <take> <hideTest> - Get donations with pagination and test donation filter
+  update                                - Update current hotkeys from VTube Studio
+  execute <id|name>                     - Execute a hotkey by ID or name
+  help                                  - Show this help message
+  exit                                  - Exit app
 =====================`
 	fmt.Println(help_text)
 
@@ -45,8 +51,39 @@ Commands:
 		switch command {
 		case "createwebhook":
 			CreateWebhookCmd(conn, c)
+
 		case "getwebhooks":
 			GetWebhooksCmd(conn, c)
+
+		case "deletewebhook":
+			if len(parts) < 2 {
+				fmt.Println("Usage: deletewebhook <id>")
+				continue
+			}
+			DeleteWebhookCmd(conn, c, parts[1])
+
+		case "getdonations":
+			if len(parts) != 4 {
+				fmt.Println("Usage: getdonations <skip> <take> <hideTest>")
+				continue
+			}
+			skip, err := strconv.Atoi(parts[1])
+			if err != nil {
+				fmt.Println("Invalid skip value, should be an number")
+				continue
+			}
+			take, err := strconv.Atoi(parts[2])
+			if err != nil {
+				fmt.Println("Invalid take value, should be an number")
+				continue
+			}
+			if parts[3] != "true" && parts[3] != "false" {
+				fmt.Println("Invalid hideTest value, should be 'true' or 'false'")
+				continue
+			}
+			hideTest := parts[3]
+			GetDonationsCmd(conn, c, skip, take, hideTest)
+
 		case "execute":
 			if len(parts) < 2 {
 				fmt.Println("Usage: execute <id|name>")
@@ -60,7 +97,16 @@ Commands:
 		
 		case "help":
 			fmt.Println(help_text)
-
+		
+		case "Devsign":
+			if len(parts) < 3 {
+				fmt.Println("Usage: Devsign <secret> <body>")
+				continue
+			}
+			secret := parts[1]
+			body := strings.Join(parts[2:], " ")
+			ConvertBodyToSignatureCmd(secret, []byte(body))
+		
 		case "exit":
 			fmt.Println("Exiting app...")
 			exitChan <- struct{}{}
@@ -106,4 +152,27 @@ func CreateWebhookCmd(conn *websocket.Conn, c *client.Client) {
 		return
 	}
 	fmt.Printf("✓ Created webhook: %+v\n", webhook)
+}
+
+func DeleteWebhookCmd(conn *websocket.Conn, c *client.Client, webhookId string) {
+	if err := c.DeleteWebhook(webhookId); err != nil {
+		fmt.Printf("Error: %v\n", err)
+	} else {
+		fmt.Printf("✓ Deleted webhook with ID: %s\n", webhookId)
+	}
+}
+
+func GetDonationsCmd(conn *websocket.Conn, c *client.Client, skip, take int, hideTest string) {
+	if err := c.GetDonations(skip, take, hideTest); err != nil {
+		fmt.Printf("Error: %v\n", err)
+	} else {
+		fmt.Printf("✓ Retrieved donations (skip: %d, take: %d)\n", skip, take)
+	}
+}
+
+func ConvertBodyToSignatureCmd(secret string, body []byte){
+	expectedSignature := hmac.New(sha256.New, []byte(secret))
+	expectedSignature.Write(body)
+	expectedSignatureHex := hex.EncodeToString(expectedSignature.Sum(nil))
+	fmt.Printf("Expected signature: %s\n", expectedSignatureHex)
 }

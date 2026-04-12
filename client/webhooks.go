@@ -24,7 +24,7 @@ func (c *Client) CreateWebhook() (*Webhook, error) {
 	if err != nil {
 		return nil, fmt.Errorf("Failed to load secret: %v", err)
 	}
-	
+
 	body := map[string]string{
 		"url":       secret.WebhookURL,
 		"secret":    secret.WebhookSecret,
@@ -80,4 +80,18 @@ func (c *Client) GetWebhooks() ([]Webhook, error) {
 	}
 
 	return webhooks, nil
+}
+
+func (c *Client) DeleteWebhook(webhookId string) error {
+	resp, err := c.DoRequest("DELETE", fmt.Sprintf("webhooks/subscriptions/%s", webhookId), nil, nil)
+	if err != nil {
+		return err
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode != http.StatusNoContent {
+		return fmt.Errorf("API request failed with status: %s", resp.Status)
+	}
+
+	return nil
 }

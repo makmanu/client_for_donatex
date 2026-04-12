@@ -26,7 +26,7 @@ func StartListener(cfg *config.Config, secret *config.Secret) {
 	}
 
 	http.HandleFunc("/webhook", func(w http.ResponseWriter, r *http.Request) {
-		fmt.Println("Received webhook request")
+		log.Println("Received webhook request")
 
 		if r.Method != http.MethodPost {
 			http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
