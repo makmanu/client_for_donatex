@@ -53,7 +53,7 @@ func main() {
 	fmt.Println("Authenticated with VTube Studio plugin")
 
 	// Start the listener
-	go listener.StartListener(cfg)
+	go listener.StartListener(cfg, secret)
 
 	// Example: Get donations
 	err = c.GetDonations(0, 4, "true") // skip 0, take 4

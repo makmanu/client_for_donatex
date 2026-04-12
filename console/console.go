@@ -16,7 +16,7 @@ func Start(conn *websocket.Conn, exitChan chan struct{}) {
 
 	help_text := `=== Donatex Console ===
 Commands:
-  update	         - Update current hotkeys from VTube Studio
+  update             - Update current hotkeys from VTube Studio
   execute <id|name>  - Execute a hotkey by ID or name
   help               - Show this help message
   exit               - Exit console

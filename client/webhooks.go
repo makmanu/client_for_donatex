@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+
+	"github.com/makmanu/client_for_donatex/config"
 )
 
 type Webhook struct {
@@ -16,12 +18,12 @@ type Webhook struct {
 	FailureCount int    `json:"failureCount"`
 }
 
-func (c *Client) CreateWebhook(webhookURL, eventType, clientId, secret string) (*Webhook, error) {
+func (c *Client) CreateWebhook(secret *config.Secret) (*Webhook, error) {
 	body := map[string]string{
-		"url":       webhookURL,
-		"secret":    secret,
-		"eventType": eventType,
-		"clientId":  clientId,
+		"url":       secret.WebhookURL,
+		"secret":    secret.WebhookSecret,
+		"eventType": "DonationCreated",
+		"clientId":  secret.ClientId,
 	}
 	resp, err := c.DoRequest("POST", "webhooks/subscriptions", body, nil)
 	if err != nil {

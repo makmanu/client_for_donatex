@@ -16,7 +16,7 @@ import (
 	"github.com/makmanu/client_for_donatex/config"
 )
 
-func StartListener(cfg *config.Config) {
+func StartListener(cfg *config.Config, secret *config.Secret) {
 	logFile := cfg.LogFile
 	if logFile == "" {
 		logFile = "webhook.log"
@@ -57,7 +57,7 @@ func StartListener(cfg *config.Config) {
 	})
 
 	fmt.Printf("Starting HTTPS listener on port %d\n", cfg.Port)
-	log.Fatal(http.ListenAndServeTLS(fmt.Sprintf(":%d", cfg.Port), cfg.CertFile, cfg.KeyFile, nil))
+	log.Fatal(http.ListenAndServeTLS(fmt.Sprintf(":%d", cfg.Port), secret.CertFile, secret.KeyFile, nil))
 }
 
 func logRequestToFile(path string, r *http.Request, body []byte) error {

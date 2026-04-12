@@ -15,8 +15,6 @@ type VTubeStudioConfig struct {
 type Config struct {
 	URL         string            `yaml:"url"`
 	Port        int               `yaml:"port"`
-	CertFile    string            `yaml:"certFile"`
-	KeyFile     string            `yaml:"keyFile"`
 	LogFile     string            `yaml:"logFile"`
 	VTubeStudio VTubeStudioConfig `yaml:"VTubeStudio"`
 }
@@ -24,6 +22,10 @@ type Config struct {
 type Secret struct {
 	Token         string `yaml:"token"`
 	WebhookSecret string `yaml:"webhookSecret"`
+	WebhookURL	  string `yaml:"webhookURL"`
+	ClientId	  string `yaml:"clientId"`
+	CertFile	  string `yaml:"certFile"`
+	KeyFile	      string `yaml:"keyFile"`
 }
 
 func LoadConfig(filename string) (*Config, error) {
