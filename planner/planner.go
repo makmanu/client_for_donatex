@@ -40,7 +40,6 @@ func (p *Planner) Start() {
 			now := time.Now()
 			for key, t := range p.schedule {
 				if now.After(t) {
-					fmt.Printf("Executing hotkey %s\n", key)
 					p.RemoveFromSchedule(key)
 					continue
 				}

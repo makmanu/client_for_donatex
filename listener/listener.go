@@ -17,6 +17,7 @@ import (
 
 	"github.com/makmanu/client_for_donatex/client"
 	"github.com/makmanu/client_for_donatex/config"
+	"github.com/makmanu/client_for_donatex/planner"
 )
 
 func StartListener(cfg *config.Config, secret *config.Secret) {
@@ -65,6 +66,25 @@ func StartListener(cfg *config.Config, secret *config.Secret) {
 		donation := payload.Data
 
 		fmt.Printf("💰 New donation from %s: %.2f %s - %s\n", donation.Username, donation.Amount, donation.Currency, donation.Message)
+
+		reqHotkeys, err := planner.GetRequestedHotkeysFromMessage(donation.Message)
+		if err != nil {
+			fmt.Printf("Error occurred while parsing hotkeys: %v\n", err)
+		}
+
+		if len(reqHotkeys) > 0 {
+			enough, err := planner.DonationIsBigEnough(reqHotkeys, donation.AmountInRub)
+			if err != nil {
+				fmt.Printf("Error occurred while checking donation amount: %v\n", err)
+			}
+			if !enough {
+				fmt.Printf(" Donation from %s is not enough for requested hotkeys\n", donation.Username)
+			} else {
+				planner.AddHotkeysToSchedule(reqHotkeys)
+			}
+		} else {
+			fmt.Printf(" No hotkeys requested in donation from %s\n", donation.Username)
+		}
 
 		w.WriteHeader(http.StatusOK)
 	})
