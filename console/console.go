@@ -8,14 +8,17 @@ import (
 
 	"github.com/gorilla/websocket"
 	"github.com/makmanu/client_for_donatex/plugin"
+	"github.com/makmanu/client_for_donatex/client"
 )
 
 // Start begins the interactive console prompt
-func Start(conn *websocket.Conn, exitChan chan struct{}) {
+func Start(conn *websocket.Conn, exitChan chan struct{}, c *client.Client) {
 	reader := bufio.NewReader(os.Stdin)
 
-	help_text := `=== Donatex Console ===
+	help_text := `=== Client_for_Donatex Console ===
 Commands:
+  createwebhook      - Create a new webhook subscription
+  getwebhooks        - List all registered webhooks
   update             - Update current hotkeys from VTube Studio
   execute <id|name>  - Execute a hotkey by ID or name
   help               - Show this help message
@@ -40,6 +43,10 @@ Commands:
 		command := parts[0]
 
 		switch command {
+		case "createwebhook":
+			CreateWebhookCmd(conn, c)
+		case "getwebhooks":
+			GetWebhooksCmd(conn, c)
 		case "execute":
 			if len(parts) < 2 {
 				fmt.Println("Usage: execute <id|name>")
@@ -79,4 +86,24 @@ func GetCurrentHotkeysCmd(conn *websocket.Conn) {
 	} else {
 		fmt.Printf("✓ Retrieved current hotkeys\n")
 	}
+}
+
+func GetWebhooksCmd(conn *websocket.Conn, c *client.Client) {
+	webhooks, err := c.GetWebhooks()
+	if err != nil {
+		fmt.Printf("Error: %v\n", err)
+		return
+	}
+	for _, webhook := range webhooks {
+		fmt.Printf("✓ Webhook: %+v\n", webhook)
+	}
+}
+
+func CreateWebhookCmd(conn *websocket.Conn, c *client.Client) {
+	webhook, err := c.CreateWebhook()
+	if err != nil {
+		fmt.Printf("Error: %v\n", err)
+		return
+	}
+	fmt.Printf("✓ Created webhook: %+v\n", webhook)
 }

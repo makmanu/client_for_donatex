@@ -18,7 +18,13 @@ type Webhook struct {
 	FailureCount int    `json:"failureCount"`
 }
 
-func (c *Client) CreateWebhook(secret *config.Secret) (*Webhook, error) {
+func (c *Client) CreateWebhook() (*Webhook, error) {
+	
+	secret, err := config.LoadSecret("secret.yaml")
+	if err != nil {
+		return nil, fmt.Errorf("Failed to load secret: %v", err)
+	}
+	
 	body := map[string]string{
 		"url":       secret.WebhookURL,
 		"secret":    secret.WebhookSecret,
@@ -49,4 +55,29 @@ func (c *Client) CreateWebhook(secret *config.Secret) (*Webhook, error) {
 	}
 
 	return &webhook, nil
+}
+
+func (c *Client) GetWebhooks() ([]Webhook, error) {
+	resp, err := c.DoRequest("GET", "webhooks/subscriptions", nil, nil)
+	if err != nil {
+		return nil, err
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode != http.StatusOK {
+		return nil, fmt.Errorf("API request failed with status: %s", resp.Status)
+	}
+
+	body, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return nil, fmt.Errorf("failed to read response body: %v", err)
+	}
+
+	var webhooks []Webhook
+	err = json.Unmarshal(body, &webhooks)
+	if err != nil {
+		return nil, fmt.Errorf("failed to parse JSON: %v", err)
+	}
+
+	return webhooks, nil
 }

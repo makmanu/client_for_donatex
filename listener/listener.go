@@ -2,6 +2,9 @@ package listener
 
 import (
 	"bytes"
+	"crypto/hmac"
+	"crypto/sha256"
+	"encoding/hex"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -37,6 +40,16 @@ func StartListener(cfg *config.Config, secret *config.Secret) {
 		}
 		r.Body.Close()
 		r.Body = io.NopCloser(bytes.NewReader(body))
+
+		// Verify webhook signature
+		expectedSignature := hmac.New(sha256.New, []byte(secret.WebhookSecret))
+		expectedSignature.Write(body)
+		expectedSignatureHex := hex.EncodeToString(expectedSignature.Sum(nil))
+
+		if expectedSignatureHex != r.Header.Get("x-donatex-signature") {
+			http.Error(w, "invalid signature", http.StatusBadRequest)
+			return
+		}
 
 		if err := logRequestToFile(logFile, r, body); err != nil {
 			fmt.Printf("Failed to write webhook log: %v\n", err)

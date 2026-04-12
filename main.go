@@ -98,7 +98,7 @@ func main() {
 		return
 	}*/
 
-	/*webhook, err := c.CreateWebhook("https://makmanu.com:3000/webhook", "DonationCreated", "Client_1", secret.WebhookSecret)
+	/*webhook, err := c.CreateWebhook()
 	if err != nil {
 		fmt.Println("Error:", err)
 		return
@@ -107,7 +107,7 @@ func main() {
 
 	// Start the console
 	exitChan := make(chan struct{})
-	go console.Start(pluginConn, exitChan)
+	go console.Start(pluginConn, exitChan, c)
 	// wait for exit signal
 	select {
 	case <-exitChan:
