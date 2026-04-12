@@ -10,13 +10,12 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/gorilla/websocket"
 	"github.com/makmanu/client_for_donatex/client"
 	"github.com/makmanu/client_for_donatex/plugin"
 )
 
 // Start begins the interactive console prompt
-func Start(conn *websocket.Conn, exitChan chan struct{}, c *client.Client) {
+func Start(exitChan chan struct{}, c *client.Client) {
 	reader := bufio.NewReader(os.Stdin)
 
 	help_text := `=== Client_for_Donatex Console ===
@@ -50,17 +49,17 @@ Commands:
 
 		switch command {
 		case "createwebhook":
-			CreateWebhookCmd(conn, c)
+			createWebhookCmd(c)
 
 		case "getwebhooks":
-			GetWebhooksCmd(conn, c)
+			getWebhooksCmd(c)
 
 		case "deletewebhook":
 			if len(parts) < 2 {
 				fmt.Println("Usage: deletewebhook <id>")
 				continue
 			}
-			DeleteWebhookCmd(conn, c, parts[1])
+			deleteWebhookCmd(c, parts[1])
 
 		case "getdonations":
 			if len(parts) != 4 {
@@ -82,7 +81,7 @@ Commands:
 				continue
 			}
 			hideTest := parts[3]
-			GetDonationsCmd(conn, c, skip, take, hideTest)
+			getDonationsCmd(c, skip, take, hideTest)
 
 		case "execute":
 			if len(parts) < 2 {
@@ -90,10 +89,10 @@ Commands:
 				continue
 			}
 			identifier := strings.Join(parts[1:], " ")
-			executeHotkeyCmd(conn, identifier)
+			executeHotkeyCmd(identifier)
 
 		case "update":
-			GetCurrentHotkeysCmd(conn)
+			getCurrentHotkeysCmd()
 		
 		case "help":
 			fmt.Println(help_text)
@@ -105,7 +104,7 @@ Commands:
 			}
 			secret := parts[1]
 			body := strings.Join(parts[2:], " ")
-			ConvertBodyToSignatureCmd(secret, []byte(body))
+			convertBodyToSignatureCmd(secret, []byte(body))
 		
 		case "exit":
 			fmt.Println("Exiting app...")
@@ -118,23 +117,23 @@ Commands:
 	}
 }
 
-func executeHotkeyCmd(conn *websocket.Conn, identifier string) {
-	if err := plugin.ExecuteHotkey(conn, identifier); err != nil {
+func executeHotkeyCmd(identifier string) {
+	if err := plugin.ExecuteHotkey(identifier); err != nil {
 		fmt.Printf("Error: %v\n", err)
 	} else {
 		fmt.Printf("✓ Executed hotkey: %s\n", identifier)
 	}
 }
 
-func GetCurrentHotkeysCmd(conn *websocket.Conn) {
-	if err := plugin.GetCurrentHotkeys(conn); err != nil {
+func getCurrentHotkeysCmd() {
+	if err := plugin.GetCurrentHotkeys(); err != nil {
 		fmt.Printf("Error: %v\n", err)
 	} else {
 		fmt.Printf("✓ Retrieved current hotkeys\n")
 	}
 }
 
-func GetWebhooksCmd(conn *websocket.Conn, c *client.Client) {
+func getWebhooksCmd(c *client.Client) {
 	webhooks, err := c.GetWebhooks()
 	if err != nil {
 		fmt.Printf("Error: %v\n", err)
@@ -145,7 +144,7 @@ func GetWebhooksCmd(conn *websocket.Conn, c *client.Client) {
 	}
 }
 
-func CreateWebhookCmd(conn *websocket.Conn, c *client.Client) {
+func createWebhookCmd(c *client.Client) {
 	webhook, err := c.CreateWebhook()
 	if err != nil {
 		fmt.Printf("Error: %v\n", err)
@@ -154,7 +153,7 @@ func CreateWebhookCmd(conn *websocket.Conn, c *client.Client) {
 	fmt.Printf("✓ Created webhook: %+v\n", webhook)
 }
 
-func DeleteWebhookCmd(conn *websocket.Conn, c *client.Client, webhookId string) {
+func deleteWebhookCmd(c *client.Client, webhookId string) {
 	if err := c.DeleteWebhook(webhookId); err != nil {
 		fmt.Printf("Error: %v\n", err)
 	} else {
@@ -162,7 +161,7 @@ func DeleteWebhookCmd(conn *websocket.Conn, c *client.Client, webhookId string) 
 	}
 }
 
-func GetDonationsCmd(conn *websocket.Conn, c *client.Client, skip, take int, hideTest string) {
+func getDonationsCmd(c *client.Client, skip, take int, hideTest string) {
 	if err := c.GetDonations(skip, take, hideTest); err != nil {
 		fmt.Printf("Error: %v\n", err)
 	} else {
@@ -170,7 +169,7 @@ func GetDonationsCmd(conn *websocket.Conn, c *client.Client, skip, take int, hid
 	}
 }
 
-func ConvertBodyToSignatureCmd(secret string, body []byte){
+func convertBodyToSignatureCmd(secret string, body []byte){
 	expectedSignature := hmac.New(sha256.New, []byte(secret))
 	expectedSignature.Write(body)
 	expectedSignatureHex := hex.EncodeToString(expectedSignature.Sum(nil))

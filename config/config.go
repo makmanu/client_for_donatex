@@ -13,10 +13,11 @@ type VTubeStudioConfig struct {
 }
 
 type Config struct {
-	URL         string            `yaml:"url"`
-	Port        int               `yaml:"port"`
-	LogFile     string            `yaml:"logFile"`
-	VTubeStudio VTubeStudioConfig `yaml:"VTubeStudio"`
+	URL             string            `yaml:"url"`
+	Port            int               `yaml:"port"`
+	LogFile         string            `yaml:"logFile"`
+	VTubeStudio     VTubeStudioConfig `yaml:"VTubeStudio"`
+	MinimumDuration float64           `yaml:"minimumDuration"`
 }
 
 type Secret struct {

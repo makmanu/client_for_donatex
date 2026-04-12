@@ -9,6 +9,7 @@ import (
 	"github.com/makmanu/client_for_donatex/config"
 	"github.com/makmanu/client_for_donatex/console"
 	"github.com/makmanu/client_for_donatex/listener"
+	"github.com/makmanu/client_for_donatex/planner"
 	"github.com/makmanu/client_for_donatex/plugin"
 )
 
@@ -39,14 +40,14 @@ func main() {
 	// Initialize the client
 	c := client.NewClient(cfg.URL, secret.Token)
 
-	pluginConn, err := plugin.ConnectPluginWebsocket(cfg)
+	err = plugin.ConnectPluginWebsocket(cfg)
 	if err != nil {
 		log.Fatalf("Failed to connect to VTube Studio plugin websocket: %v", err)
 	}
-	defer pluginConn.Close()
+	defer plugin.ClosePluginWebsocket()
 	fmt.Println("Connected to VTube Studio plugin websocket")
 
-	err = plugin.SessionAuthPlugin(pluginConn)
+	err = plugin.SessionAuthPlugin()
 	if err != nil {
 		log.Fatalf("Failed to authenticate with VTube Studio plugin: %v", err)
 	}
@@ -63,13 +64,17 @@ func main() {
 	}
 
 	fmt.Println("Getting current hotkeys from VTube Studio...")
-	err = plugin.GetCurrentHotkeys(pluginConn)
+	err = plugin.GetCurrentHotkeys()
 	if err != nil {
 		fmt.Println("Error:", err)
 		return
 	} else {
 		fmt.Println("Successfully retrieved current hotkeys from VTube Studio and saved to file plugin/hotkeys.yaml")
 	}
+
+	fmt.Print("Starting planner...")
+	planner := planner.NewPlanner(cfg.MinimumDuration)
+	go planner.Start()
 
 	/*fmt.Println("Trying to execute 1 hotkey")
 	err = plugin.ExecuteHotkey(pluginConn, "1")
@@ -107,11 +112,8 @@ func main() {
 
 	// Start the console
 	exitChan := make(chan struct{})
-	go console.Start(pluginConn, exitChan, c)
+	go console.Start(exitChan, c)
 	// wait for exit signal
-	select {
-	case <-exitChan:
-		fmt.Println("Received exit signal, shutting down...")
-		return
-	}
+	<-exitChan
+	fmt.Println("Received exit signal, shutting down...")
 }

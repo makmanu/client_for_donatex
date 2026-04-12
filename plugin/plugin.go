@@ -41,22 +41,23 @@ var (
 	pendingResponses map[string]chan wsResponse
 	pendingMu        sync.Mutex
 	workersOnce      sync.Once
+	conn             *websocket.Conn
 )
 
-func startWsWorkers(conn *websocket.Conn) {
+func startWsWorkers() {
 	wsRequestCh = make(chan wsRequest, 32)
 	pendingResponses = make(map[string]chan wsResponse)
-	go wsSender(conn)
-	go wsReader(conn)
+	go wsSender()
+	go wsReader()
 }
 
-func ensureWsWorkers(conn *websocket.Conn) {
+func ensureWsWorkers() {
 	workersOnce.Do(func() {
-		startWsWorkers(conn)
+		startWsWorkers()
 	})
 }
 
-func wsSender(conn *websocket.Conn) {
+func wsSender() {
 	for req := range wsRequestCh {
 		log.Printf("[REQUEST] %v", req.msg)
 		if err := conn.WriteJSON(req.msg); err != nil {
@@ -66,7 +67,7 @@ func wsSender(conn *websocket.Conn) {
 	}
 }
 
-func wsReader(conn *websocket.Conn) {
+func wsReader() {
 	for {
 		var resp struct {
 			RequestID   string         `json:"requestID"`
@@ -104,8 +105,8 @@ func signalPendingWsError(err error) {
 	}
 }
 
-func sendWebsocketRequest(conn *websocket.Conn, msg map[string]any) (wsResponse, error) {
-	ensureWsWorkers(conn)
+func sendWebsocketRequest(msg map[string]any) (wsResponse, error) {
+	ensureWsWorkers()
 
 	requestID, ok := msg["requestID"].(string)
 	if !ok || requestID == "" {
@@ -127,20 +128,27 @@ func sendWebsocketRequest(conn *websocket.Conn, msg map[string]any) (wsResponse,
 	return res, nil
 }
 
-func ConnectPluginWebsocket(cfg *config.Config) (*websocket.Conn, error) {
+func ConnectPluginWebsocket(cfg *config.Config) error {
 	if cfg == nil {
-		return nil, fmt.Errorf("config must not be nil")
+		return fmt.Errorf("config must not be nil")
 	}
 
 	url := fmt.Sprintf("%s:%d", cfg.VTubeStudio.URL, cfg.VTubeStudio.Port)
-	conn, _, err := websocket.DefaultDialer.Dial(url, nil)
+	wsConnection, _, err := websocket.DefaultDialer.Dial(url, nil)
 	if err != nil {
-		return nil, fmt.Errorf("failed to connect to VTubeStudio websocket at %s: %w", url, err)
+		return fmt.Errorf("failed to connect to VTubeStudio websocket at %s: %w", url, err)
 	}
-	return conn, nil
+	conn = wsConnection
+	return nil
 }
 
-func GetAuthToken(conn *websocket.Conn) error {
+func ClosePluginWebsocket() {
+	if conn != nil {
+		conn.Close()
+	}
+}
+
+func GetAuthToken() error {
 	if conn == nil {
 		return fmt.Errorf("websocket connection must not be nil")
 	}
@@ -168,7 +176,7 @@ func GetAuthToken(conn *websocket.Conn) error {
 		},
 	}
 
-	res, err := sendWebsocketRequest(conn, req)
+	res, err := sendWebsocketRequest(req)
 	if err != nil {
 		return err
 	}
@@ -188,7 +196,7 @@ func GetAuthToken(conn *websocket.Conn) error {
 		if err := os.WriteFile("plugin/token", []byte(authToken), 0o600); err != nil {
 			return fmt.Errorf("failed to save auth token: %w", err)
 		}
-		return SessionAuthPlugin(conn)
+		return SessionAuthPlugin()
 
 	case "APIError":
 		if res.data != nil {
@@ -211,7 +219,7 @@ func GetAuthToken(conn *websocket.Conn) error {
 		return fmt.Errorf("unexpected auth response messageType: %s", res.messageType)
 	}
 }
-func SessionAuthPlugin(conn *websocket.Conn) error {
+func SessionAuthPlugin() error {
 	if conn == nil {
 		return fmt.Errorf("websocket connection must not be nil")
 	}
@@ -238,7 +246,7 @@ func SessionAuthPlugin(conn *websocket.Conn) error {
 			"authenticationToken": token,
 		},
 	}
-	res, err := sendWebsocketRequest(conn, req)
+	res, err := sendWebsocketRequest(req)
 	if err != nil {
 		return err
 	}
@@ -249,7 +257,7 @@ func SessionAuthPlugin(conn *websocket.Conn) error {
 			if authenticated, ok := res.data["authenticated"]; !ok || !authenticated.(bool) {
 				fmt.Print(ok, authenticated, "3\n")
 				fmt.Printf("Session authentication failed: %v\n Trying to get new auth token...\n", res.data)
-				return GetAuthToken(conn)
+				return GetAuthToken()
 			}
 			return nil
 		}
@@ -259,7 +267,7 @@ func SessionAuthPlugin(conn *websocket.Conn) error {
 	return fmt.Errorf("unexpected session auth response messageType: %s", res.messageType)
 }
 
-func GetCurrentHotkeys(conn *websocket.Conn) error {
+func GetCurrentHotkeys() error {
 	if conn == nil {
 		return fmt.Errorf("websocket connection must not be nil")
 	}
@@ -271,7 +279,7 @@ func GetCurrentHotkeys(conn *websocket.Conn) error {
 		"messageType": "HotkeysInCurrentModelRequest",
 	}
 
-	res, err := sendWebsocketRequest(conn, req)
+	res, err := sendWebsocketRequest(req)
 	if err != nil {
 		return err
 	}
@@ -332,7 +340,7 @@ func GetCurrentHotkeys(conn *websocket.Conn) error {
 	return nil
 }
 
-func ExecuteHotkey(conn *websocket.Conn, identifier string) error {
+func ExecuteHotkey(identifier string) error {
 	if conn == nil {
 		return fmt.Errorf("websocket connection must not be nil")
 	}
@@ -374,7 +382,7 @@ func ExecuteHotkey(conn *websocket.Conn, identifier string) error {
 
 	fmt.Printf("Sending hotkey trigger request: %s, %s, %s, %s, %v\n", req["apiName"], req["apiVersion"], req["requestID"], req["messageType"], req["data"])
 
-	res, err := sendWebsocketRequest(conn, req)
+	res, err := sendWebsocketRequest(req)
 	if err != nil {
 		return err
 	}
