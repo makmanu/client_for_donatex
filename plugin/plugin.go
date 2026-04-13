@@ -10,19 +10,12 @@ import (
 	"time"
 
 	"github.com/gorilla/websocket"
-	"github.com/makmanu/client_for_donatex/config"
+	"github.com/makmanu/client_for_donatex/structs"
 	"gopkg.in/yaml.v3"
 )
 
-type Hotkey struct {
-	ID          int     `yaml:"id"`
-	Name        string  `yaml:"name"`
-	HotkeyID    string  `yaml:"hotkeyID"`
-	Coefficient float64 `yaml:"coefficient"`
-}
-
 type HotkeysResponse struct {
-	AvailableHotkeys []Hotkey `yaml:"availableHotkeys"`
+	AvailableHotkeys []structs.Hotkey `yaml:"availableHotkeys"`
 }
 
 type wsRequest struct {
@@ -129,7 +122,7 @@ func sendWebsocketRequest(msg map[string]any) (wsResponse, error) {
 	return res, nil
 }
 
-func ConnectPluginWebsocket(cfg *config.Config) error {
+func ConnectPluginWebsocket(cfg *structs.Config) error {
 	if cfg == nil {
 		return fmt.Errorf("config must not be nil")
 	}
@@ -386,9 +379,9 @@ func ExecuteHotkey(identifier string) error {
 	return nil
 }
 
-func FindHotkeyInfoByIdentifier(identifier string) (Hotkey, error) {
+func FindHotkeyInfoByIdentifier(identifier string) (structs.Hotkey, error) {
 	found := false
-	targetHotkey := Hotkey{}
+	targetHotkey := structs.Hotkey{}
 	for _, hotkey := range hotkeysResp.AvailableHotkeys {
 		if strconv.Itoa(hotkey.ID) == identifier || hotkey.Name == identifier {
 			targetHotkey = hotkey
@@ -397,7 +390,7 @@ func FindHotkeyInfoByIdentifier(identifier string) (Hotkey, error) {
 		}
 	}
 	if !found {
-		return Hotkey{}, fmt.Errorf("hotkey with identifier '%s' not found", identifier)
+		return structs.Hotkey{}, fmt.Errorf("hotkey with identifier '%s' not found", identifier)
 	}
 	return targetHotkey, nil
  }

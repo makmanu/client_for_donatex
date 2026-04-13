@@ -3,39 +3,17 @@ package config
 import (
 	"os"
 
+	"github.com/makmanu/client_for_donatex/structs"
 	"gopkg.in/yaml.v3"
 )
 
-type VTubeStudioConfig struct {
-	URL        string `yaml:"url"`
-	Port       int    `yaml:"port"`
-	PluginName string `yaml:"pluginName"`
-}
-
-type Config struct {
-	URL             string            `yaml:"url"`
-	Port            int               `yaml:"port"`
-	LogFile         string            `yaml:"logFile"`
-	VTubeStudio     VTubeStudioConfig `yaml:"VTubeStudio"`
-	MinimumDuration int           `yaml:"minimumDuration"`
-}
-
-type Secret struct {
-	Token         string `yaml:"token"`
-	WebhookSecret string `yaml:"webhookSecret"`
-	WebhookURL	  string `yaml:"webhookURL"`
-	ClientId	  string `yaml:"clientId"`
-	CertFile	  string `yaml:"certFile"`
-	KeyFile	      string `yaml:"keyFile"`
-}
-
-func LoadConfig(filename string) (*Config, error) {
+func LoadConfig(filename string) (*structs.Config, error) {
 	data, err := os.ReadFile(filename)
 	if err != nil {
 		return nil, err
 	}
 
-	var config Config
+	var config structs.Config
 	err = yaml.Unmarshal(data, &config)
 	if err != nil {
 		return nil, err
@@ -44,13 +22,13 @@ func LoadConfig(filename string) (*Config, error) {
 	return &config, nil
 }
 
-func LoadSecret(filename string) (*Secret, error) {
+func LoadSecret(filename string) (*structs.Secret, error) {
 	data, err := os.ReadFile(filename)
 	if err != nil {
 		return nil, err
 	}
 
-	var secret Secret
+	var secret structs.Secret
 	err = yaml.Unmarshal(data, &secret)
 	if err != nil {
 		return nil, err

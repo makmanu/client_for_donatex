@@ -7,6 +7,7 @@ import (
 	"strconv"
 
 	"github.com/makmanu/client_for_donatex/plugin"
+	"github.com/makmanu/client_for_donatex/structs"
 )
 
 func GetRequestedHotkeysFromMessage(message string) (map[string]int, error) {
@@ -55,4 +56,25 @@ func AddHotkeysToSchedule(reqHotkeys map[string]int) {
 		DefaultPlanner.plannerCh <- fmt.Sprintf("add %s %d", identifier, seconds)
 		log.Printf("Added hotkey %s for %d seconds to schedule\n", identifier, seconds)
 	}
+}
+
+func HandleDonation(donation structs.Donation) {
+	reqHotkeys, err := GetRequestedHotkeysFromMessage(donation.Message)
+		if err != nil {
+			fmt.Printf("Error occurred while parsing hotkeys: %v\n", err)
+		}
+
+		if len(reqHotkeys) > 0 {
+			enough, err := DonationIsBigEnough(reqHotkeys, donation.AmountInRub)
+			if err != nil {
+				fmt.Printf("Error occurred while checking donation amount: %v\n", err)
+			}
+			if !enough {
+				fmt.Printf(" Donation from %s is not enough for requested hotkeys\n", donation.Username)
+			} else {
+				AddHotkeysToSchedule(reqHotkeys)
+			}
+		} else {
+			fmt.Printf(" No hotkeys requested in donation from %s\n", donation.Username)
+		}
 }

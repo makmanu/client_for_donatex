@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"fmt"
 	"log"
 	"os"
@@ -8,7 +9,6 @@ import (
 	"github.com/makmanu/client_for_donatex/client"
 	"github.com/makmanu/client_for_donatex/config"
 	"github.com/makmanu/client_for_donatex/console"
-	"github.com/makmanu/client_for_donatex/listener"
 	"github.com/makmanu/client_for_donatex/planner"
 	"github.com/makmanu/client_for_donatex/plugin"
 )
@@ -35,7 +35,7 @@ func main() {
 		log.Fatalf("Failed to load secret: %v", err)
 	}
 
-	fmt.Printf("Loaded config: URL=%s, Token=%s, Port=%d\n", cfg.URL, secret.Token, cfg.Port)
+	fmt.Printf("Loaded config: URL=%s, Token=%s", cfg.URL, secret.Token)
 
 	// Initialize the client
 	c := client.NewClient(cfg.URL, secret.Token)
@@ -52,9 +52,6 @@ func main() {
 		log.Fatalf("Failed to authenticate with VTube Studio plugin: %v", err)
 	}
 	fmt.Println("Authenticated with VTube Studio plugin")
-
-	// Start the listener
-	go listener.StartListener(cfg, secret)
 
 	// Example: Get donations
 	err = c.GetDonations(0, 4, "true") // skip 0, take 4
@@ -75,6 +72,21 @@ func main() {
 	fmt.Print("Starting planner...\n")
 	planner := planner.NewPlanner(cfg.MinimumDuration)
 	go planner.Start()
+
+	ctx := context.Background()
+
+	signalrClient, err := client.ConnectWithTokenAutoReconnect(
+		ctx,
+		"https://donatex.gg",
+		secret.Token,
+	)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	_ = signalrClient
+
+	fmt.Println("signalrClient started")
 
 	/*fmt.Println("Trying to execute 1 hotkey")
 	err = plugin.ExecuteHotkey(pluginConn, "1")

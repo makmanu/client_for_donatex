@@ -7,36 +7,13 @@ import (
 	"io"
 	"net/http"
 	"net/url"
+
+	"github.com/makmanu/client_for_donatex/structs"
 )
 
 type Client struct {
 	BaseURL string
 	APIKey  string
-}
-
-type Donation struct {
-	ID                  string  `json:"id"`
-	Username            string  `json:"username"`
-	Message             string  `json:"message"`
-	Currency            string  `json:"currency"`
-	Amount              float64 `json:"amount"`
-	AmountInRub         float64 `json:"amountInRub"`
-	Timestamp           string  `json:"timestamp"`
-	WithAiResponse      bool    `json:"withAiResponse"`
-	AiResponse          string  `json:"aiResponse"`
-	IsTest              bool    `json:"isTest"`
-	IsPotentiallyUnsafe bool    `json:"isPotentiallyUnsafe"`
-	WasShown            bool    `json:"wasShown"`
-	IsFeePaidByUser     bool    `json:"isFeePaidByUser"`
-	VoiceFilePath       string  `json:"voiceFilePath"`
-	PaidVoice           string  `json:"paidVoice"`
-	MusicLink           string  `json:"musicLink"`
-}
-
-type WebhookPayload struct {
-	EventType string   `json:"eventType"`
-	Data      Donation `json:"data"`
-	Timestamp string   `json:"timestamp"`
 }
 
 func NewClient(baseURL, apiKey string) *Client {
@@ -119,7 +96,7 @@ func (c *Client) GetDonations(skip, take int, hideTest string) error {
 		return fmt.Errorf("failed to read response body: %v", err)
 	}
 
-	var donations []Donation
+	var donations []structs.Donation
 	err = json.Unmarshal(body, &donations)
 	if err != nil {
 		return fmt.Errorf("failed to parse JSON: %v", err)

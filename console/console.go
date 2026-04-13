@@ -21,9 +21,6 @@ func Start(exitChan chan struct{}, c *client.Client) {
 
 	help_text := `=== Client_for_Donatex Console ===
 Commands:
-  deletewebhook <id>                    - Delete a webhook subscription by ID
-  createwebhook                         - Create a new webhook subscription
-  getwebhooks                           - List all registered webhooks
   getdonations <skip> <take> <hideTest> - Get donations with pagination and test donation filter
   update                                - Update current hotkeys from VTube Studio
   execute <id|name>                     - Execute a hotkey by ID or name
@@ -52,18 +49,6 @@ Commands:
 		switch command {
 		case "executetime":
 			executetimeCmd(parts[1], parts[2])
-		case "createwebhook":
-			createWebhookCmd(c)
-
-		case "getwebhooks":
-			getWebhooksCmd(c)
-
-		case "deletewebhook":
-			if len(parts) < 2 {
-				fmt.Println("Usage: deletewebhook <id>")
-				continue
-			}
-			deleteWebhookCmd(c, parts[1])
 
 		case "getdonations":
 			if len(parts) != 4 {
@@ -134,34 +119,6 @@ func getCurrentHotkeysCmd() {
 		fmt.Printf("Error: %v\n", err)
 	} else {
 		fmt.Printf("✓ Retrieved current hotkeys\n")
-	}
-}
-
-func getWebhooksCmd(c *client.Client) {
-	webhooks, err := c.GetWebhooks()
-	if err != nil {
-		fmt.Printf("Error: %v\n", err)
-		return
-	}
-	for _, webhook := range webhooks {
-		fmt.Printf("✓ Webhook: %+v\n", webhook)
-	}
-}
-
-func createWebhookCmd(c *client.Client) {
-	webhook, err := c.CreateWebhook()
-	if err != nil {
-		fmt.Printf("Error: %v\n", err)
-		return
-	}
-	fmt.Printf("✓ Created webhook: %+v\n", webhook)
-}
-
-func deleteWebhookCmd(c *client.Client, webhookId string) {
-	if err := c.DeleteWebhook(webhookId); err != nil {
-		fmt.Printf("Error: %v\n", err)
-	} else {
-		fmt.Printf("✓ Deleted webhook with ID: %s\n", webhookId)
 	}
 }
 

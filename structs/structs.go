@@ -1,0 +1,43 @@
+package structs
+
+type VTubeStudioConfig struct {
+	URL        string `yaml:"url"`
+	Port       int    `yaml:"port"`
+	PluginName string `yaml:"pluginName"`
+}
+
+type Config struct {
+	URL             string            `yaml:"url"`
+	VTubeStudio     VTubeStudioConfig `yaml:"VTubeStudio"`
+	MinimumDuration int           `yaml:"minimumDuration"`
+}
+
+type Secret struct {
+	Token         string `yaml:"token"`
+}
+
+type Hotkey struct {
+	ID          int     `yaml:"id"`
+	Name        string  `yaml:"name"`
+	HotkeyID    string  `yaml:"hotkeyID"`
+	Coefficient float64 `yaml:"coefficient"`
+}
+
+type Donation struct {
+	ID                  string  `json:"id"`
+	Username            string  `json:"username"`
+	Message             string  `json:"message"`
+	Currency            string  `json:"currency"`
+	Amount              float64 `json:"amount"`
+	AmountInRub         float64 `json:"amountInRub"`
+	Timestamp           string  `json:"timestamp"`
+	WithAiResponse      bool    `json:"withAiResponse"`
+	AiResponse          string  `json:"aiResponse"`
+	IsTest              bool    `json:"isTest"`
+	IsPotentiallyUnsafe bool    `json:"isPotentiallyUnsafe"`
+	WasShown            bool    `json:"wasShown"`
+	IsFeePaidByUser     bool    `json:"isFeePaidByUser"`
+	VoiceFilePath       string  `json:"voiceFilePath"`
+	PaidVoice           string  `json:"paidVoice"`
+	MusicLink           string  `json:"musicLink"`
+}
