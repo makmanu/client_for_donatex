@@ -164,6 +164,8 @@ func GetAuthToken() error {
 		},
 	}
 
+	fmt.Println("Awaiting user to accept plugin authentication in VTube Studio...")
+
 	res, err := sendWebsocketRequest(req)
 	if err != nil {
 		return err
@@ -181,7 +183,7 @@ func GetAuthToken() error {
 		if !ok || authToken == "" {
 			return fmt.Errorf("authentication response missing authenticationToken")
 		}
-		if err := os.WriteFile("plugin/token", []byte(authToken), 0o600); err != nil {
+		if err := os.WriteFile("token", []byte(authToken), 0o600); err != nil {
 			return fmt.Errorf("failed to save auth token: %w", err)
 		}
 		return SessionAuthPlugin()
@@ -212,9 +214,9 @@ func SessionAuthPlugin() error {
 		return fmt.Errorf("websocket connection must not be nil")
 	}
 
-	tokenBytes, err := os.ReadFile("plugin/token")
+	tokenBytes, err := os.ReadFile("token")
 	if err != nil {
-		return fmt.Errorf("failed to read auth token: %w", err)
+		return GetAuthToken()
 	}
 	token := strings.TrimSpace(string(tokenBytes))
 	if token == "" {
@@ -243,7 +245,6 @@ func SessionAuthPlugin() error {
 	case "AuthenticationResponse":
 		if res.data != nil {
 			if authenticated, ok := res.data["authenticated"]; !ok || !authenticated.(bool) {
-				fmt.Print(ok, authenticated, "3\n")
 				fmt.Printf("Session authentication failed: %v\n Trying to get new auth token...\n", res.data)
 				return GetAuthToken()
 			}

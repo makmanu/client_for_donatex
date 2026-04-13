@@ -2,7 +2,6 @@ package main
 
 import (
 	"context"
-	"fmt"
 	"log"
 	"os"
 
@@ -11,6 +10,7 @@ import (
 	"github.com/makmanu/client_for_donatex/console"
 	"github.com/makmanu/client_for_donatex/planner"
 	"github.com/makmanu/client_for_donatex/plugin"
+	"github.com/makmanu/client_for_donatex/startfiles"
 )
 
 func main() {
@@ -22,12 +22,16 @@ func main() {
 	defer logFile.Close()
 	log.SetOutput(logFile)
 
-	fmt.Println("Starting donatex API client...")
+	err = startfiles.CheckMandatoryFiles()
+	if err != nil {
+		log.Fatalf("Failed to create start files: %v", err)
+	}
 
-	// Load configuration
+	log.Println("Starting donatex API client...")
+
 	cfg, err := config.LoadConfig("config.yaml")
 	if err != nil {
-		log.Fatalf("Failed to load config: %v", err)
+		log.Fatalf("Failed to load config: %v", err)	
 	}
 
 	secret, err := config.LoadSecret("secret.yaml")
@@ -35,9 +39,8 @@ func main() {
 		log.Fatalf("Failed to load secret: %v", err)
 	}
 
-	fmt.Printf("Loaded config: URL=%s, Token=%s", cfg.URL, secret.Token)
+	log.Printf("Loaded config")
 
-	// Initialize the client
 	c := client.NewClient(cfg.URL, secret.Token)
 
 	err = plugin.ConnectPluginWebsocket(cfg)
@@ -45,34 +48,29 @@ func main() {
 		log.Fatalf("Failed to connect to VTube Studio plugin websocket: %v", err)
 	}
 	defer plugin.ClosePluginWebsocket()
-	fmt.Println("Connected to VTube Studio plugin websocket")
+	log.Println("Connected to VTube Studio plugin websocket")
 
 	err = plugin.SessionAuthPlugin()
 	if err != nil {
 		log.Fatalf("Failed to authenticate with VTube Studio plugin: %v", err)
 	}
-	fmt.Println("Authenticated with VTube Studio plugin")
+	log.Println("Authenticated with VTube Studio plugin")
 
-	// Example: Get donations
-	err = c.GetDonations(0, 4, "true") // skip 0, take 4
-	if err != nil {
-		fmt.Println("Error:", err)
-		return
-	}
-
-	fmt.Println("Getting current hotkeys from VTube Studio...")
+	log.Println("Getting current hotkeys from VTube Studio...")
 	err = plugin.GetCurrentHotkeys()
 	if err != nil {
-		fmt.Println("Error:", err)
+		log.Printf("Error: %v", err)
 		return
 	} else {
-		fmt.Println("Successfully retrieved current hotkeys from VTube Studio and saved to file plugin/hotkeys.yaml")
+		log.Println("Successfully retrieved current hotkeys from VTube Studio and saved to file plugin/hotkeys.yaml")
 	}
 
-	fmt.Print("Starting planner...\n")
+	log.Print("Starting planner...\n")
 	planner := planner.NewPlanner(cfg.MinimumDuration, cfg.MaximumHotkeysPerDonation)
 	go planner.Start()
+	log.Print("Planner started\n")
 
+	log.Print("Starting SignalR client...\n")
 	ctx := context.Background()
 
 	signalrClient, err := client.ConnectWithTokenAutoReconnect(
@@ -86,11 +84,11 @@ func main() {
 
 	_ = signalrClient
 
-	fmt.Println("signalrClient started")
+	log.Println("signalrClient started")
 
 	/*err = c.TestDonations(228, "mrHrunDell", "Проверка донатов)", "RUB", false)
 	if err != nil {
-		fmt.Println("Error:", err)
+		log.Printf("Error: %v", err)
 		return
 	}*/
 
@@ -99,5 +97,5 @@ func main() {
 	go console.Start(exitChan, c)
 	// wait for exit signal
 	<-exitChan
-	fmt.Println("Received exit signal, shutting down...")
+	log.Println("Received exit signal, shutting down...")
 }
