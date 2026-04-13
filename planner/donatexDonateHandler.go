@@ -43,19 +43,25 @@ func DonationIsBigEnough(reqHotkeys map[string]int, donationAmount float64) (boo
 		}
 		hotkey, err := plugin.FindHotkeyInfoByIdentifier(identifier)
 		if err != nil {
+			fmt.Printf("Couldn't find hotkey with identifier '%s': %v\n", identifier, err)
 			delete(reqHotkeys, identifier)
 			continue
 		}
+		fmt.Printf("Hotkey %s with coefficient %.2f requested for %d seconds(%.2f roubles)\n", hotkey.Name, hotkey.Coefficient, seconds, hotkey.Coefficient * float64(seconds))
 		sum += hotkey.Coefficient * float64(seconds)
 	}
+	fmt.Printf("Requested amount %.2f, donated amount %.2f\n", sum, donationAmount)
 	return donationAmount >= sum, nil
 }
 
-func AddHotkeysToSchedule(reqHotkeys map[string]int) {
-	for identifier, seconds := range reqHotkeys {
-		DefaultPlanner.plannerCh <- fmt.Sprintf("add %s %d", identifier, seconds)
-		log.Printf("Added hotkey %s for %d seconds to schedule\n", identifier, seconds)
+func AddHotkeyToSchedule(identifier string, seconds int) {
+	signal := structs.PlannerSignal{
+		Command: "add",
+		Hotkey:  identifier,
+		Seconds: seconds,
 	}
+	DefaultPlanner.plannerCh <- signal
+	log.Printf("Added hotkey %s for %d seconds to schedule\n", identifier, seconds)
 }
 
 func HandleDonation(donation structs.Donation) {
@@ -63,18 +69,39 @@ func HandleDonation(donation structs.Donation) {
 		if err != nil {
 			fmt.Printf("Error occurred while parsing hotkeys: %v\n", err)
 		}
-
+		if len(reqHotkeys) > DefaultPlanner.maximumHotkeysPerDonation {
+			fmt.Printf("Too many hotkeys requested: %d. Maximum is %d(can be changed in config), skipping...\n", len(reqHotkeys), DefaultPlanner.maximumHotkeysPerDonation)
+		}
 		if len(reqHotkeys) > 0 {
-			enough, err := DonationIsBigEnough(reqHotkeys, donation.AmountInRub)
-			if err != nil {
-				fmt.Printf("Error occurred while checking donation amount: %v\n", err)
-			}
-			if !enough {
-				fmt.Printf(" Donation from %s is not enough for requested hotkeys\n", donation.Username)
+			donationAmount := 0.0
+			if donation.Currency == "RUB" {
+				fmt.Println(donation.Amount)
+				donationAmount = donation.Amount
 			} else {
-				AddHotkeysToSchedule(reqHotkeys)
+				fmt.Println("false")
+				donationAmount = donation.AmountInRub
+			}
+			fmt.Printf("? Donation amount: %.2f RUB\n", donationAmount)
+			for identifier, seconds := range reqHotkeys {
+				if seconds < DefaultPlanner.minimumDuration {
+					fmt.Printf("- Hotkey '%s' was requested for %d seconds but it less than minimum duration %d seconds (can be changed in config), skipping...\n", identifier, seconds, DefaultPlanner.minimumDuration)
+					continue
+				}
+				hotkey, err := plugin.FindHotkeyInfoByIdentifier(identifier)
+				if err != nil {
+					fmt.Printf("- Couldn't find hotkey with identifier '%s', skipping...\n", identifier)
+					continue
+				}
+				needToSpent := hotkey.Coefficient * float64(seconds)
+				if donationAmount < needToSpent {
+					fmt.Printf("- Not enough money for hotkey '%s'. Need %.2f RUB but %.2f RUB remain, skipping...\n", hotkey.Name, needToSpent, donationAmount)
+					continue
+				}
+				donationAmount -= needToSpent
+				fmt.Printf("✓ Hotkey '%s' with coefficient %.2f requested for %d seconds(%.2f RUB)\n? Remain amount: %.2f RUB\n", hotkey.Name, hotkey.Coefficient, seconds, needToSpent, donationAmount)
+				AddHotkeyToSchedule(hotkey.Name, seconds)
 			}
 		} else {
-			fmt.Printf(" No hotkeys requested in donation from %s\n", donation.Username)
+			fmt.Printf("No hotkey requests were found in donation from %s\n", donation.Username)
 		}
 }

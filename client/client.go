@@ -104,8 +104,8 @@ func (c *Client) GetDonations(skip, take int, hideTest string) error {
 
 	fmt.Printf("Retrieved %d donations (skip: %d, take: %d):\n", len(donations), skip, take)
 	for i, donation := range donations {
-		fmt.Printf("%d. Username: %s\n\t Message: %s,\n\t Amount: %.2f %s (%.2f RUB),\n\t Timestamp: %s\n\n",
-			i+1, donation.Username, donation.Message, donation.Amount, donation.Currency, donation.AmountInRub, donation.Timestamp)
+		fmt.Printf("%d. Username: %s\n\t Message: %s,\n\t Amount: %.2f %s (%.2f RUB),\n\t test: %t,\n\t Timestamp: %s\n\n",
+			i+1, donation.Username, donation.Message, donation.Amount, donation.Currency, donation.AmountInRub, donation.IsTest, donation.Timestamp)
 	}
 
 	return nil

@@ -2,37 +2,37 @@ package planner
 
 import (
 	"fmt"
-	"strconv"
-	"strings"
 	"time"
 
 	"github.com/makmanu/client_for_donatex/plugin"
+	"github.com/makmanu/client_for_donatex/structs"
 )
 
 type Planner struct {
-	minimumDuration int
-	plannerCh       chan string
-	ticker          *time.Ticker
-	schedule        map[string]time.Time
-	oldSchedule     map[string]time.Duration
+	minimumDuration           int
+	maximumHotkeysPerDonation int
+	plannerCh                 chan structs.PlannerSignal
+	ticker                    *time.Ticker
+	schedule                  map[string]time.Time
+	oldSchedule               map[string]time.Duration
 }
 
 var DefaultPlanner *Planner
 
-func NewPlanner(minimumDuration int) *Planner {
-	plannerCh := make(chan string)
+func NewPlanner(minimumDuration, maximumHotkeysPerDonation int) *Planner {
+	plannerCh := make(chan structs.PlannerSignal)
 	DefaultPlanner = &Planner{
-		minimumDuration: minimumDuration,
-		plannerCh:       plannerCh,
-		ticker:          time.NewTicker(100 * time.Millisecond),
-		schedule:        make(map[string]time.Time),
-		oldSchedule:     make(map[string]time.Duration),
+		maximumHotkeysPerDonation: maximumHotkeysPerDonation,
+		minimumDuration:           minimumDuration,
+		plannerCh:                 plannerCh,
+		ticker:                    time.NewTicker(100 * time.Millisecond),
+		schedule:                  make(map[string]time.Time),
+		oldSchedule:               make(map[string]time.Duration),
 	}
 	return DefaultPlanner
 }
 
 func (p *Planner) Start() {
-	signal := ""
 	changed := false
 	for {
 		select {
@@ -56,27 +56,16 @@ func (p *Planner) Start() {
 				changed = false
 			}
 
-		case signal = <-p.plannerCh:
-			signalParts := strings.Fields(signal)
-			switch signalParts[0] {
+		case signal := <-p.plannerCh:
+			switch signal.Command {
 			case "add":
-				if len(signalParts) < 3 {
-					fmt.Println("Invalid add signal. Usage: add <key> <time_in_seconds>")
-					return
-				}
-				key := signalParts[1]
-				time_in_seconds, err := strconv.Atoi(signalParts[2])
-				if err != nil {
-					fmt.Println("Invalid time value. Please enter a valid integer.")
-					return
-				}
-				err = p.AddToSchedule(key, time_in_seconds)
+				err := p.AddToSchedule(signal.Hotkey, signal.Seconds)
 				if err != nil {
 					fmt.Println("Error:", err)
 					return
 				}
 			default:
-				fmt.Printf("Unknown signal: %s\n", signalParts[0])
+				fmt.Printf("Unknown signal: %s\n", signal.Command)
 			}
 		}
 	}

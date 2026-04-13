@@ -7,9 +7,11 @@ type VTubeStudioConfig struct {
 }
 
 type Config struct {
-	URL             string            `yaml:"url"`
-	VTubeStudio     VTubeStudioConfig `yaml:"VTubeStudio"`
-	MinimumDuration int           `yaml:"minimumDuration"`
+	URL                        string            `yaml:"url"`
+	VTubeStudio                VTubeStudioConfig `yaml:"VTubeStudio"`
+	MinimumDuration            int               `yaml:"minimumDuration"`
+	MaximumHotkeysPerDonation  int               `yaml:"maximumHotkeysPerDonation"`
+	DefaultCoefficient         float64           `yaml:"defaultHotkeyCoefficient"`
 }
 
 type Secret struct {
@@ -40,4 +42,10 @@ type Donation struct {
 	VoiceFilePath       string  `json:"voiceFilePath"`
 	PaidVoice           string  `json:"paidVoice"`
 	MusicLink           string  `json:"musicLink"`
+}
+
+type PlannerSignal struct {
+	Command string
+	Hotkey  string
+	Seconds int
 }

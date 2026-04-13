@@ -70,7 +70,7 @@ func main() {
 	}
 
 	fmt.Print("Starting planner...\n")
-	planner := planner.NewPlanner(cfg.MinimumDuration)
+	planner := planner.NewPlanner(cfg.MinimumDuration, cfg.MaximumHotkeysPerDonation)
 	go planner.Start()
 
 	ctx := context.Background()
@@ -88,39 +88,11 @@ func main() {
 
 	fmt.Println("signalrClient started")
 
-	/*fmt.Println("Trying to execute 1 hotkey")
-	err = plugin.ExecuteHotkey(pluginConn, "1")
-	if err != nil {
-		fmt.Println("Error:", err)
-		return
-	} else {
-		fmt.Println("Successfully activated hotkey with ID 1")
-	}*/
-
-	/*fmt.Println("Trying to execute 1 hotkey in 2 seconds")
-	go func() {
-		time.Sleep(2 * time.Second)
-		err = plugin.ExecuteHotkey(pluginConn, "1")
-		if err != nil {
-			fmt.Println("Error:", err)
-			return
-		} else {
-			fmt.Println("Successfully activated hotkey with ID 1")
-		}
-	}()*/
-
 	/*err = c.TestDonations(228, "mrHrunDell", "Проверка донатов)", "RUB", false)
 	if err != nil {
 		fmt.Println("Error:", err)
 		return
 	}*/
-
-	/*webhook, err := c.CreateWebhook()
-	if err != nil {
-		fmt.Println("Error:", err)
-		return
-	}
-	fmt.Printf("Created webhook: %+v\n", webhook)*/
 
 	// Start the console
 	exitChan := make(chan struct{})

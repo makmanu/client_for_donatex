@@ -36,6 +36,7 @@ var (
 	workersOnce      sync.Once
 	conn             *websocket.Conn
 	hotkeysResp      HotkeysResponse
+	cfg			     *structs.Config
 )
 
 func startWsWorkers() {
@@ -122,10 +123,11 @@ func sendWebsocketRequest(msg map[string]any) (wsResponse, error) {
 	return res, nil
 }
 
-func ConnectPluginWebsocket(cfg *structs.Config) error {
-	if cfg == nil {
+func ConnectPluginWebsocket(config *structs.Config) error {
+	if config == nil {
 		return fmt.Errorf("config must not be nil")
 	}
+	cfg = config
 
 	url := fmt.Sprintf("%s:%d", cfg.VTubeStudio.URL, cfg.VTubeStudio.Port)
 	wsConnection, _, err := websocket.DefaultDialer.Dial(url, nil)
@@ -281,7 +283,7 @@ func GetCurrentHotkeys() error {
 	}
 
 	// Read coefficients from file
-	coeffData, err := os.ReadFile("plugin/coefficient.yaml")
+	coeffData, err := os.ReadFile("coefficient.yaml")
 	if err != nil {
 		coeffData = []byte{}
 	}
@@ -303,7 +305,7 @@ func GetCurrentHotkeys() error {
 				hotkeyMap["id"] = id
 
 				// Look up coefficient or use default
-				coeff := 2.5
+				coeff := cfg.DefaultCoefficient
 				if val, ok := coefficients["coefficients"].(map[any]any)[id]; ok {
 					if f, ok := val.(float64); ok {
 						coeff = f
@@ -325,7 +327,7 @@ func GetCurrentHotkeys() error {
 		return fmt.Errorf("failed to unmarshal yaml data: %w", err)
 	}
 
-	if err := os.WriteFile("plugin/hotkeys.yaml", yamlData, 0644); err != nil {
+	if err := os.WriteFile("hotkeys.yaml", yamlData, 0644); err != nil {
 		return fmt.Errorf("failed to write hotkeys to file: %w", err)
 	}
 
@@ -338,7 +340,7 @@ func ExecuteHotkey(identifier string) error {
 	}
 
 	// Read hotkeys.yaml
-	yamlData, err := os.ReadFile("plugin/hotkeys.yaml")
+	yamlData, err := os.ReadFile("hotkeys.yaml")
 	if err != nil {
 		return fmt.Errorf("failed to read hotkeys.yaml: %w", err)
 	}
@@ -373,6 +375,7 @@ func ExecuteHotkey(identifier string) error {
 	}
 
 	if res.messageType != "HotkeyTriggerResponse" {
+		log.Default().Printf("Error: %v", res.data)
 		return fmt.Errorf("unexpected response type: %s", res.messageType)
 	}
 
