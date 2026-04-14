@@ -115,7 +115,7 @@ func (p *Planner) RemoveItemFromSchedule(itemNameToRemove string) error {
 		if itemName == itemNameToRemove {
 			err := p.schedule[itemName].FunctionToStop(p.schedule[itemName].ArgsforStop...)
 			if err != nil {
-				log.Printf("Error executing function: %w", err)
+				log.Printf("Error executing function: %v", err)
 			}
 			delete(p.schedule, itemName)
 			delete(p.oldSchedule, itemName)

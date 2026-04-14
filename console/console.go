@@ -96,7 +96,7 @@ Commands:
 				continue
 			}
 			identifier := strings.Join(parts[1:], " ")
-			removeHotkeyFromScheduleCmd(identifier)
+			removeItemFromScheduleCmd(identifier)
 
 		case "exit":
 			fmt.Println("Exiting app...")
