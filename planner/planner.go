@@ -2,6 +2,8 @@ package planner
 
 import (
 	"fmt"
+	"log"
+	"os"
 	"time"
 
 	"github.com/makmanu/client_for_donatex/plugin"
@@ -15,12 +17,19 @@ type Planner struct {
 	ticker                    *time.Ticker
 	schedule                  map[string]time.Time
 	oldSchedule               map[string]time.Duration
+	scheduleScreen            *os.File
 }
 
 var DefaultPlanner *Planner
 
 func NewPlanner(minimumDuration, maximumHotkeysPerDonation int) *Planner {
 	plannerCh := make(chan structs.PlannerSignal)
+	Screen, err := os.OpenFile("scheduleScreen.txt", os.O_CREATE|os.O_WRONLY, 0644)
+	if err != nil {
+		log.Printf("Error opening schedule screen file: %v\n", err)
+	} else {
+		Screen.WriteString("Current schedule:\n")
+	}
 	DefaultPlanner = &Planner{
 		maximumHotkeysPerDonation: maximumHotkeysPerDonation,
 		minimumDuration:           minimumDuration,
@@ -28,6 +37,7 @@ func NewPlanner(minimumDuration, maximumHotkeysPerDonation int) *Planner {
 		ticker:                    time.NewTicker(100 * time.Millisecond),
 		schedule:                  make(map[string]time.Time),
 		oldSchedule:               make(map[string]time.Duration),
+		scheduleScreen:            Screen,
 	}
 	return DefaultPlanner
 }
@@ -40,7 +50,10 @@ func (p *Planner) Start() {
 			now := time.Now()
 			for key, t := range p.schedule {
 				if now.After(t) {
-					p.RemoveFromSchedule(key)
+					err := p.RemoveFromSchedule(key)
+					if err != nil {
+						log.Printf("Error removing hotkey from schedule: %v\n", err)
+					}
 					continue
 				}
 				if oldT, ok := p.oldSchedule[key]; !ok || oldT.Round(time.Second).Seconds() != t.Sub(now).Round(time.Second).Seconds() {
@@ -49,9 +62,13 @@ func (p *Planner) Start() {
 				}
 			}
 			if changed {
-				fmt.Printf("Current schedule:\n")
+				p.scheduleScreen.Truncate(0)
+				p.scheduleScreen.Seek(0, 0)
+				p.scheduleScreen.WriteString("Current schedule:\n")
 				for key, t := range p.schedule {
-					fmt.Printf("  %s: %s\n", key, t.Sub(now).Round(time.Second))
+					if secondsToDisplay := t.Sub(now).Round(time.Second); secondsToDisplay > 0 {
+						p.scheduleScreen.WriteString(fmt.Sprintf("  %s: %s\n", key, secondsToDisplay))
+					}
 				}
 				changed = false
 			}
@@ -89,12 +106,23 @@ func (p *Planner) AddToSchedule(key string, time_in_seconds int) error {
 	return nil
 }
 
-func (p *Planner) RemoveFromSchedule(key string) {
+func (p *Planner) RemoveFromSchedule(key string) error {
 	hotkey, err := plugin.FindHotkeyInfoByIdentifier(key)
 	if err != nil {
-		return
+		return fmt.Errorf("Error finding hotkey: %w", err)
 	}
-	delete(p.schedule, hotkey.Name)
-	delete(p.oldSchedule, hotkey.Name)
-	plugin.ExecuteHotkey(hotkey.Name)
+	for hotkeyName := range p.schedule {
+		if hotkeyName == hotkey.Name {
+			delete(p.schedule, hotkeyName)
+			delete(p.oldSchedule, hotkeyName)
+			err = plugin.ExecuteHotkey(hotkeyName)
+			if err != nil {
+				return fmt.Errorf("Error executing hotkey: %w", err)
+			}
+			fmt.Printf("Removed hotkey %s from schedule\n", hotkeyName)
+			return nil
+		}
+	}
+	fmt.Printf("Hotkey '%s' not found in schedule", key)
+	return nil
 }

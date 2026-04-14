@@ -296,6 +296,7 @@ func GetCurrentHotkeys() error {
 		}
 	} else {
 		coefficients = make(map[any]any)
+		coefficients["coefficients"] = make(map[any]any)
 	}
 
 	// Add ID and coefficient to each hotkey
@@ -304,10 +305,18 @@ func GetCurrentHotkeys() error {
 			if hotkeyMap, ok := hotkey.(map[string]any); ok {
 				id := i + 1
 				hotkeyMap["id"] = id
+				name := hotkeyMap["name"].(string)
 
 				// Look up coefficient or use default
 				coeff := cfg.DefaultCoefficient
 				if val, ok := coefficients["coefficients"].(map[any]any)[id]; ok {
+					if f, ok := val.(float64); ok {
+						coeff = f
+					} else if i, ok := val.(int); ok {
+						coeff = float64(i)
+					}
+				}
+				if val, ok := coefficients["coefficients"].(map[any]any)[name]; ok {
 					if f, ok := val.(float64); ok {
 						coeff = f
 					} else if i, ok := val.(int); ok {

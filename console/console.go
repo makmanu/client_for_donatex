@@ -22,6 +22,7 @@ Commands:
   update                                - Update current hotkeys from VTube Studio
   execute <id|name>                     - Execute a hotkey by ID or name
   executetime <id|name> <seconds>       - Schedule a hotkey to execute after a certain time
+  remove <id|name>                      - Remove a hotkey from the schedule
   help                                  - Show this help message
   exit                                  - Exit app
 =====================`
@@ -45,7 +46,13 @@ Commands:
 
 		switch command {
 		case "executetime":
-			executetimeCmd(parts[1], parts[2])
+			if len(parts) < 3 {
+				fmt.Println("Usage: executetime <id|name> <seconds>")
+				continue
+			}
+			identifierCmd := strings.Join(parts[1:len(parts)-1], " ")
+			secondsCmd := parts[len(parts)-1]
+			executetimeCmd(identifierCmd, secondsCmd)
 
 		case "getdonations":
 			if len(parts) != 4 {
@@ -83,6 +90,14 @@ Commands:
 		case "help":
 			fmt.Println(help_text)
 		
+		case "remove":
+			if len(parts) < 2 {
+				fmt.Println("Usage: remove <id|name>")
+				continue
+			}
+			identifier := strings.Join(parts[1:], " ")
+			removeHotkeyFromScheduleCmd(identifier)
+
 		case "exit":
 			fmt.Println("Exiting app...")
 			exitChan <- struct{}{}
@@ -131,4 +146,13 @@ func executetimeCmd(key string, time string) {
 	}
 
 	fmt.Printf("✓ Added hotkey %s to schedule to execute for %d seconds\n", key, time_in_seconds)
+}
+
+func removeHotkeyFromScheduleCmd(identifier string) {
+	err := planner.DefaultPlanner.RemoveFromSchedule(identifier)
+	if err != nil {
+		fmt.Printf("Error: %v\n", err)
+		return
+	}
+	fmt.Printf("✓ Removed hotkey %s from schedule\n", identifier)
 }
