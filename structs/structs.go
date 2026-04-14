@@ -1,5 +1,7 @@
 package structs
 
+import "time"
+
 type VTubeStudioConfig struct {
 	URL        string `yaml:"url"`
 	Port       int    `yaml:"port"`
@@ -45,7 +47,16 @@ type Donation struct {
 }
 
 type PlannerSignal struct {
-	Command string
-	Hotkey  string
-	Seconds int
+	Command  string
+	Item     ScheduleItem
+}
+
+type ScheduleItem struct {
+	Name              string
+	ArgsforExecute    []any
+	ArgsforStop       []any
+	FunctionToExecute func(...any) error
+	FunctionToStop	  func(...any) error
+	DurationinSeconds int
+	ExpiresAt         time.Time
 }

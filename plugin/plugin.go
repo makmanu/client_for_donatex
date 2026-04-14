@@ -344,7 +344,7 @@ func GetCurrentHotkeys() error {
 	return nil
 }
 
-func ExecuteHotkey(identifier string) error {
+func ExecuteHotkey(targetHotkey structs.Hotkey) error {
 	if conn == nil {
 		return fmt.Errorf("websocket connection must not be nil")
 	}
@@ -359,12 +359,7 @@ func ExecuteHotkey(identifier string) error {
 	if err := yaml.Unmarshal(yamlData, &hotkeysResp); err != nil {
 		return fmt.Errorf("failed to unmarshal hotkeys.yaml: %w", err)
 	}
-
-	// Find the hotkey by id or name
-	targetHotkey, err := FindHotkeyInfoByIdentifier(identifier)
-	if err != nil {
-		return err
-	}
+ 
 	targetHotkeyID := targetHotkey.HotkeyID
 
 	req := map[string]any{
@@ -407,3 +402,41 @@ func FindHotkeyInfoByIdentifier(identifier string) (structs.Hotkey, error) {
 	}
 	return targetHotkey, nil
  }
+
+ func TintModel(R, G, B, A int) error {
+	if conn == nil {
+		return fmt.Errorf("websocket connection must not be nil")
+	}
+	
+	req := map[string]any{
+		"apiName":     "VTubeStudioPublicAPI",
+		"apiVersion":  "1.0",
+		"requestID":   fmt.Sprintf("execute-hotkey-%d", time.Now().UnixNano()),
+		"messageType": "ColorTintRequest",
+		"data": map[string]any{
+			"colorTint": map[string]any{
+				"red": R,
+				"green": G,
+				"blue": B,
+				"alpha": A,
+			},
+			"artMeshMatcher": map[string]any{
+				"tintAll": true,
+			},
+		},
+	}
+
+	log.Printf("Sending color tint request: %s, %s, %s, %s, %v\n", req["apiName"], req["apiVersion"], req["requestID"], req["messageType"], req["data"])
+
+	res, err := sendWebsocketRequest(req)
+	if err != nil {
+		return err
+	}
+
+	if res.messageType != "ColorTintResponse" {
+		log.Default().Printf("Error: %v", res.data)
+		return fmt.Errorf("unexpected response type: %s", res.messageType)
+	}
+	
+	return nil
+}

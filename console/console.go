@@ -21,7 +21,7 @@ Commands:
   getdonations <skip> <take> <hideTest> - Get donations with pagination and test donation filter
   update                                - Update current hotkeys from VTube Studio
   execute <id|name>                     - Execute a hotkey by ID or name
-  executetime <id|name> <seconds>       - Schedule a hotkey to execute after a certain time
+  executetime <id|name> <seconds>       - Schedule a hotkey to execute for a certain time
   remove <id|name>                      - Remove a hotkey from the schedule
   help                                  - Show this help message
   exit                                  - Exit app
@@ -110,10 +110,15 @@ Commands:
 }
 
 func executeHotkeyCmd(identifier string) {
-	if err := plugin.ExecuteHotkey(identifier); err != nil {
+	hotkey, err := plugin.FindHotkeyInfoByIdentifier(identifier)
+	if err != nil {
+		fmt.Printf("Error: %v\n", err)
+		return
+	}
+	if err := plugin.ExecuteHotkey(hotkey); err != nil {
 		fmt.Printf("Error: %v\n", err)
 	} else {
-		fmt.Printf("✓ Executed hotkey: %s\n", identifier)
+		fmt.Printf("✓ Executed hotkey: %s\n", hotkey.Name)
 	}
 }
 
@@ -139,7 +144,7 @@ func executetimeCmd(key string, time string) {
 		fmt.Println("Invalid time value, should be an number")
 		return
 	}
-	err = planner.DefaultPlanner.AddToSchedule(key, time_in_seconds)
+	err = planner.DefaultPlanner.AddHotkeyToSchedule(key, time_in_seconds)
 	if err != nil {
 		fmt.Printf("Error: %v\n", err)
 		return
@@ -148,11 +153,11 @@ func executetimeCmd(key string, time string) {
 	fmt.Printf("✓ Added hotkey %s to schedule to execute for %d seconds\n", key, time_in_seconds)
 }
 
-func removeHotkeyFromScheduleCmd(identifier string) {
-	err := planner.DefaultPlanner.RemoveFromSchedule(identifier)
+func removeItemFromScheduleCmd(itemName string) {
+	err := planner.DefaultPlanner.RemoveItemFromSchedule(itemName)
 	if err != nil {
 		fmt.Printf("Error: %v\n", err)
 		return
 	}
-	fmt.Printf("✓ Removed hotkey %s from schedule\n", identifier)
+	fmt.Printf("✓ Removed hotkey %s from schedule\n", itemName)
 }

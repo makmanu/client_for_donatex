@@ -2,7 +2,6 @@ package planner
 
 import (
 	"fmt"
-	"log"
 	"regexp"
 	"strconv"
 
@@ -54,16 +53,6 @@ func DonationIsBigEnough(reqHotkeys map[string]int, donationAmount float64) (boo
 	return donationAmount >= sum, nil
 }
 
-func AddHotkeyToSchedule(identifier string, seconds int) {
-	signal := structs.PlannerSignal{
-		Command: "add",
-		Hotkey:  identifier,
-		Seconds: seconds,
-	}
-	DefaultPlanner.plannerCh <- signal
-	log.Printf("Added hotkey %s for %d seconds to schedule\n", identifier, seconds)
-}
-
 func HandleDonation(donation structs.Donation) {
 	reqHotkeys, err := GetRequestedHotkeysFromMessage(donation.Message)
 		if err != nil {
@@ -99,7 +88,7 @@ func HandleDonation(donation structs.Donation) {
 				}
 				donationAmount -= needToSpent
 				fmt.Printf("✓ Hotkey '%s' with coefficient %.2f requested for %d seconds(%.2f RUB)\n? Remain amount: %.2f RUB\n", hotkey.Name, hotkey.Coefficient, seconds, needToSpent, donationAmount)
-				AddHotkeyToSchedule(hotkey.Name, seconds)
+				DefaultPlanner.AddHotkeyToSchedule(hotkey.Name, seconds)
 			}
 		} else {
 			fmt.Printf("No hotkey requests were found in donation from %s\n", donation.Username)
