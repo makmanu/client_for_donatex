@@ -415,10 +415,10 @@ func FindHotkeyInfoByIdentifier(identifier string) (structs.Hotkey, error) {
 		"messageType": "ColorTintRequest",
 		"data": map[string]any{
 			"colorTint": map[string]any{
-				"red": R,
-				"green": G,
-				"blue": B,
-				"alpha": A,
+				"colorR": R,
+				"colorG": G,
+				"colorB": B,
+				"colorA": A,
 			},
 			"artMeshMatcher": map[string]any{
 				"tintAll": true,

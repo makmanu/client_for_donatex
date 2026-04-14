@@ -18,11 +18,12 @@ func Start(exitChan chan struct{}, c *client.Client) {
 
 	help_text := `=== Client_for_Donatex Console ===
 Commands:
+  tint <r> <g> <b> <a>             - Tint model with specified RGBA color
   getdonations <skip> <take> <hideTest> - Get donations with pagination and test donation filter
   update                                - Update current hotkeys from VTube Studio
   execute <id|name>                     - Execute a hotkey by ID or name
   executetime <id|name> <seconds>       - Schedule a hotkey to execute for a certain time
-  remove <id|name>                      - Remove a hotkey from the schedule
+  remove <name>                         - Remove a hotkey from the schedule
   help                                  - Show this help message
   exit                                  - Exit app
 =====================`
@@ -83,6 +84,33 @@ Commands:
 			}
 			identifier := strings.Join(parts[1:], " ")
 			executeHotkeyCmd(identifier)
+		
+		case "tint":
+			if len(parts) != 5 {
+				fmt.Println("Usage: tintmodel <r> <g> <b> <a>")
+				continue
+			}
+			r, err := strconv.Atoi(parts[1])
+			if err != nil {
+				fmt.Println("Invalid r value, should be an integer")
+				continue
+			}
+			g, err := strconv.Atoi(parts[2])
+			if err != nil {
+				fmt.Println("Invalid g value, should be an integer")
+				continue
+			}
+			b, err := strconv.Atoi(parts[3])
+			if err != nil {
+				fmt.Println("Invalid b value, should be an integer")
+				continue
+			}
+			a, err := strconv.Atoi(parts[4])
+			if err != nil {
+				fmt.Println("Invalid a value, should be an integer")
+				continue
+			}
+			tintModelCmd(r, g, b, a)
 
 		case "update":
 			getCurrentHotkeysCmd()
@@ -160,4 +188,13 @@ func removeItemFromScheduleCmd(itemName string) {
 		return
 	}
 	fmt.Printf("✓ Removed hotkey %s from schedule\n", itemName)
+}
+
+func tintModelCmd(r, g, b, a int) {
+	err := plugin.TintModel(r, g, b, a)
+	if err != nil {
+		fmt.Printf("Error: %v\n", err)
+		return
+	}
+	fmt.Printf("✓ Tinted model with color RGBA(%d, %d, %d, %d)\n", r, g, b, a)
 }
