@@ -2,8 +2,10 @@ package main
 
 import (
 	"context"
+	"fmt"
 	"log"
 	"os"
+	"time"
 
 	"github.com/makmanu/client_for_donatex/client"
 	"github.com/makmanu/client_for_donatex/config"
@@ -37,6 +39,17 @@ func main() {
 	secret, err := config.LoadSecret("secret.yaml")
 	if err != nil {
 		log.Fatalf("Failed to load secret: %v", err)
+	}
+
+	if len(secret.Token) < 250 {
+		log.Println("Invalid donatex token")
+		err := os.Remove("secret.yaml")
+		if err != nil {
+			log.Printf("Failed to remove invalid secret file: %v", err)
+		}
+		fmt.Println("DonateX token seems invalid, restart app and enter correct token\nDonateX token can be find here: https://donatex.gg/streamer/settings\nApp will be closed in 5 seconds...")
+		time.Sleep(5 * time.Second)
+		return
 	}
 
 	log.Printf("Loaded config")

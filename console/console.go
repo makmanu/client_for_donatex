@@ -2,9 +2,6 @@ package console
 
 import (
 	"bufio"
-	"crypto/hmac"
-	"crypto/sha256"
-	"encoding/hex"
 	"fmt"
 	"os"
 	"strconv"
@@ -86,15 +83,6 @@ Commands:
 		case "help":
 			fmt.Println(help_text)
 		
-		case "Devsign":
-			if len(parts) < 3 {
-				fmt.Println("Usage: Devsign <secret> <body>")
-				continue
-			}
-			secret := parts[1]
-			body := strings.Join(parts[2:], " ")
-			convertBodyToSignatureCmd(secret, []byte(body))
-		
 		case "exit":
 			fmt.Println("Exiting app...")
 			exitChan <- struct{}{}
@@ -128,13 +116,6 @@ func getDonationsCmd(c *client.Client, skip, take int, hideTest string) {
 	} else {
 		fmt.Printf("✓ Retrieved donations (skip: %d, take: %d)\n", skip, take)
 	}
-}
-
-func convertBodyToSignatureCmd(secret string, body []byte){
-	expectedSignature := hmac.New(sha256.New, []byte(secret))
-	expectedSignature.Write(body)
-	expectedSignatureHex := hex.EncodeToString(expectedSignature.Sum(nil))
-	fmt.Printf("Expected signature: %s\n", expectedSignatureHex)
 }
 
 func executetimeCmd(key string, time string) {
