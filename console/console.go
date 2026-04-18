@@ -18,14 +18,16 @@ func Start(exitChan chan struct{}, c *client.Client) {
 
 	help_text := `=== Client_for_Donatex Console ===
 Commands:
-  tint <r> <g> <b> <a>             - Tint model with specified RGBA color
-  getdonations <skip> <take> <hideTest> - Get donations with pagination and test donation filter
-  update                                - Update current hotkeys from VTube Studio
-  execute <id|name>                     - Execute a hotkey by ID or name
-  executetime <id|name> <seconds>       - Schedule a hotkey to execute for a certain time
-  remove <name>                         - Remove a hotkey from the schedule
-  help                                  - Show this help message
-  exit                                  - Exit app
+  tint <r> <g> <b> <a>                          - Tint model with specified RGBA color
+  tintmeshes <r> <g> <b> <a> <mesh1 mesh2...>   - Tint, but for choosed meshes
+  reqmeshes                                     - Get info about curent model meshes
+  getdonations <skip> <take> <hideTest>         - Get donations with pagination and test donation filter
+  update                                        - Update current hotkeys from VTube Studio
+  execute <id|name>                             - Execute a hotkey by ID or name
+  executetime <id|name> <seconds>               - Schedule a hotkey to execute for a certain time
+  remove <name>                                 - Remove a hotkey from the schedule
+  help                                          - Show this help message
+  exit                                          - Exit app
 =====================`
 	fmt.Println(help_text)
 
@@ -54,6 +56,38 @@ Commands:
 			identifierCmd := strings.Join(parts[1:len(parts)-1], " ")
 			secondsCmd := parts[len(parts)-1]
 			executetimeCmd(identifierCmd, secondsCmd)
+
+		case "reqmeshes":
+			reqMeshesCMD()
+
+		case "tintmeshes":
+			if len(parts) < 5 {
+				fmt.Println("Usage: tintmodel <r> <g> <b> <a>")
+				continue
+			}
+			r, err := strconv.Atoi(parts[1])
+			if err != nil {
+				fmt.Println("Invalid r value, should be an integer")
+				continue
+			}
+			g, err := strconv.Atoi(parts[2])
+			if err != nil {
+				fmt.Println("Invalid g value, should be an integer")
+				continue
+			}
+			b, err := strconv.Atoi(parts[3])
+			if err != nil {
+				fmt.Println("Invalid b value, should be an integer")
+				continue
+			}
+			a, err := strconv.Atoi(parts[4])
+			if err != nil {
+				fmt.Println("Invalid a value, should be an integer")
+				continue
+			}
+
+			meshes := parts[5:]
+			tintMeshesCMD(r, g, b, a, meshes)
 
 		case "getdonations":
 			if len(parts) != 4 {
@@ -197,4 +231,22 @@ func tintModelCmd(r, g, b, a int) {
 		return
 	}
 	fmt.Printf("✓ Tinted model with color RGBA(%d, %d, %d, %d)\n", r, g, b, a)
+}
+
+func reqMeshesCMD() {
+	err := plugin.RequestArtMeshList()
+	if err != nil {
+		fmt.Printf("Error: %v\n", err)
+		return
+	}
+}
+
+func tintMeshesCMD(r, g, b, a int, meshes []string){
+	err, resMeshes := plugin.TintMeshes(r, g, b, a, meshes)
+	if err != nil {
+		fmt.Printf("Error: %v\n", err)
+		return
+	}
+
+	fmt.Printf("✓ Tinted %0.f meshes with color RGBA(%d, %d, %d, %d)\n",resMeshes, r, g, b, a)
 }

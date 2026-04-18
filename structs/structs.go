@@ -60,3 +60,11 @@ type ScheduleItem struct {
 	DurationinSeconds int
 	ExpiresAt         time.Time
 }
+
+type ArtMeshInfo struct {
+	ModelLoaded          bool
+	NumberOfArtMeshNames int
+	NumberOfArtMeshTags  int
+	ArtMeshNames         []string
+	ArtMeshTags          []string
+}

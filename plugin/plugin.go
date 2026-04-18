@@ -403,7 +403,7 @@ func FindHotkeyInfoByIdentifier(identifier string) (structs.Hotkey, error) {
 	return targetHotkey, nil
  }
 
- func TintModel(R, G, B, A int) error {
+func TintModel(R, G, B, A int) error {
 	if conn == nil {
 		return fmt.Errorf("websocket connection must not be nil")
 	}
@@ -411,7 +411,7 @@ func FindHotkeyInfoByIdentifier(identifier string) (structs.Hotkey, error) {
 	req := map[string]any{
 		"apiName":     "VTubeStudioPublicAPI",
 		"apiVersion":  "1.0",
-		"requestID":   fmt.Sprintf("execute-hotkey-%d", time.Now().UnixNano()),
+		"requestID":   fmt.Sprintf("tint-model-%d", time.Now().UnixNano()),
 		"messageType": "ColorTintRequest",
 		"data": map[string]any{
 			"colorTint": map[string]any{
@@ -438,5 +438,76 @@ func FindHotkeyInfoByIdentifier(identifier string) (structs.Hotkey, error) {
 		return fmt.Errorf("unexpected response type: %s", res.messageType)
 	}
 	
+	return nil
+}
+
+func TintMeshes(R, G, B, A int, meshes []string) (error, float64) {
+	if conn == nil {
+		return fmt.Errorf("websocket connection must not be nil"), 0
+	}
+	
+	req := map[string]any{
+		"apiName":     "VTubeStudioPublicAPI",
+		"apiVersion":  "1.0",
+		"requestID":   fmt.Sprintf("tint-meshes-%d", time.Now().UnixNano()),
+		"messageType": "ColorTintRequest",
+		"data": map[string]any{
+			"colorTint": map[string]any{
+				"colorR": R,
+				"colorG": G,
+				"colorB": B,
+				"colorA": A,
+			},
+			"artMeshMatcher": map[string]any{
+				"tintAll": false,
+				"nameExact": meshes,
+			},
+		},
+	}
+
+	log.Printf("Sending meshes tint request: %s, %s, %s, %s, %v\n", req["apiName"], req["apiVersion"], req["requestID"], req["messageType"], req["data"])
+
+	res, err := sendWebsocketRequest(req)
+	if err != nil {
+		return err, 0
+	}
+
+	if res.messageType != "ColorTintResponse" {
+		log.Default().Printf("Error: %v", res.data)
+		return fmt.Errorf("unexpected response type: %s", res.messageType), 0
+	}
+	
+	return nil, res.data["matchedArtMeshes"].(float64)
+}
+
+func RequestArtMeshList() error {
+	if conn == nil {
+		return fmt.Errorf("websocket connection must not be nil")
+	}
+	
+	req := map[string]any{
+		"apiName":     "VTubeStudioPublicAPI",
+		"apiVersion":  "1.0",
+		"requestID":   fmt.Sprintf("artmesh-%d", time.Now().UnixNano()),
+		"messageType": "ArtMeshListRequest",
+	}
+
+	res, err := sendWebsocketRequest(req)
+	if err != nil {
+		return err
+	}
+
+	if res.messageType != "ArtMeshListResponse" {
+		return fmt.Errorf("unexpected response type: %s", res.messageType)
+	}
+
+	resp := struct {
+		Data map[string]any `json:"data"`
+	}{
+		Data: res.data,
+	}
+
+	log.Printf("modelLoaded: %t\nnumberOfArtMeshNames: %.2f\nnumberOfArtMeshTags: %.2f\nmeshes: %v\ntags: %v\n", resp.Data["modelLoaded"], resp.Data["numberOfArtMeshNames"], resp.Data["numberOfArtMeshTags"], resp.Data["artMeshNames"], resp.Data["artMeshTags"])
+	fmt.Printf("modelLoaded: %t\nnumberOfArtMeshNames: %.0f\nnumberOfArtMeshTags: %.0f\nmeshes: %v\ntags: %v\n", resp.Data["modelLoaded"], resp.Data["numberOfArtMeshNames"], resp.Data["numberOfArtMeshTags"], resp.Data["artMeshNames"], resp.Data["artMeshTags"])
 	return nil
 }
