@@ -283,51 +283,6 @@ func GetCurrentHotkeys() error {
 		Data: res.data,
 	}
 
-	// Read coefficients from file
-	coeffData, err := os.ReadFile("coefficient.yaml")
-	if err != nil {
-		coeffData = []byte{}
-	}
-
-	var coefficients map[any]any
-	if len(coeffData) > 0 {
-		if err := yaml.Unmarshal(coeffData, &coefficients); err != nil {
-			coefficients = make(map[any]any)
-		}
-	} else {
-		coefficients = make(map[any]any)
-		coefficients["coefficients"] = make(map[any]any)
-	}
-
-	// Add ID and coefficient to each hotkey
-	if hotkeys, ok := resp.Data["availableHotkeys"].([]any); ok {
-		for i, hotkey := range hotkeys {
-			if hotkeyMap, ok := hotkey.(map[string]any); ok {
-				id := i + 1
-				hotkeyMap["id"] = id
-				name := hotkeyMap["name"].(string)
-
-				// Look up coefficient or use default
-				coeff := cfg.DefaultCoefficient
-				if val, ok := coefficients["coefficients"].(map[any]any)[id]; ok {
-					if f, ok := val.(float64); ok {
-						coeff = f
-					} else if i, ok := val.(int); ok {
-						coeff = float64(i)
-					}
-				}
-				if val, ok := coefficients["coefficients"].(map[any]any)[name]; ok {
-					if f, ok := val.(float64); ok {
-						coeff = f
-					} else if i, ok := val.(int); ok {
-						coeff = float64(i)
-					}
-				}
-				hotkeyMap["coefficient"] = coeff
-			}
-		}
-	}
-
 	yamlData, err := yaml.Marshal(resp.Data)
 	if err != nil {
 		return fmt.Errorf("failed to marshal response to yaml: %w", err)
@@ -419,6 +374,7 @@ func TintModel(R, G, B, A int) error {
 				"colorG": G,
 				"colorB": B,
 				"colorA": A,
+				"mixWithSceneLightingColor": 0.5,
 			},
 			"artMeshMatcher": map[string]any{
 				"tintAll": true,
@@ -457,6 +413,7 @@ func TintMeshes(R, G, B, A int, meshes []string) (error, float64) {
 				"colorG": G,
 				"colorB": B,
 				"colorA": A,
+				"mixWithSceneLightingColor": 0.5,
 			},
 			"artMeshMatcher": map[string]any{
 				"tintAll": false,

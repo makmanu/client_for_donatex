@@ -6,6 +6,7 @@ secret.yaml
 makmanu.*
 token
 hotkeys.yaml
+list.yaml
 *.log
 
 # Binaries for programs and plugins

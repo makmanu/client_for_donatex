@@ -1,0 +1,50 @@
+# Available types
+#   Hotkey - any hotkey from VTS.
+#     In Args accepts tags, id. 
+#     Tags optional. hotkeys with same tags wont play simultaniosly.
+#     id mandatory. its hotkeyid.
+#   Tint - change color for selected meshes
+#     In Args accepts any amount of Colors, that should contain: listOfMeshes, R, G, B.
+#     listOfMeshes accepts []string, with any amount of mesh names that should be colored.
+#     R 0-255 of red color.
+#     G 0-255 of green color.
+#     B 0-255 of blue color.
+
+
+# Example of list.yaml
+Commands:
+  Angry:
+    Type: "Hotkey"
+    Price: "8"
+    Args:
+      Tags: []
+      Id: "1623a123fe135bcc351"
+  Cat eyes:
+    Type: "Hotkey"
+    Price: "3.3"
+    Args:
+      Tags: ["Right eye", "Left eye"]
+      Id: "cbab151356f63161fee35672"
+  Red eyes:
+    Type: "Tint"
+    Price:  "4"
+    Args:
+      Color1:
+        ListOfMeshes: ["ArtMesh1", "ArtMesh2", "ArtMesh63"]
+        R: 255
+        G: 0
+        B: 0
+  Bee hair:
+    Type: "Tint"
+    Price: "7"
+    Args:
+      Black:
+        ListOfMeshes: ["ArtMesh53", "ArtMesh23", "ArtMesh523"]
+        R: 0
+        G: 0
+        B: 0
+      Yellow:
+        ListOfMeshes: ["ArtMesh246", "ArtMesh37", "ArtMesh262"]
+        R: 255
+        G: 255
+        B: 0
