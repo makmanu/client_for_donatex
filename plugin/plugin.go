@@ -264,7 +264,7 @@ func GetCurrentHotkeys() error {
 	req := map[string]any{
 		"apiName":     "VTubeStudioPublicAPI",
 		"apiVersion":  "1.0",
-		"requestID":   fmt.Sprintf("hotkeys-%d", time.Now().UnixNano()),
+		"requestID":   fmt.Sprintf("hotkey-list-%d", time.Now().UnixNano()),
 		"messageType": "HotkeysInCurrentModelRequest",
 	}
 
@@ -509,5 +509,98 @@ func RequestArtMeshList() error {
 
 	log.Printf("modelLoaded: %t\nnumberOfArtMeshNames: %.2f\nnumberOfArtMeshTags: %.2f\nmeshes: %v\ntags: %v\n", resp.Data["modelLoaded"], resp.Data["numberOfArtMeshNames"], resp.Data["numberOfArtMeshTags"], resp.Data["artMeshNames"], resp.Data["artMeshTags"])
 	fmt.Printf("modelLoaded: %t\nnumberOfArtMeshNames: %.0f\nnumberOfArtMeshTags: %.0f\nmeshes: %v\ntags: %v\n", resp.Data["modelLoaded"], resp.Data["numberOfArtMeshNames"], resp.Data["numberOfArtMeshTags"], resp.Data["artMeshNames"], resp.Data["artMeshTags"])
+	return nil
+}
+
+func TintMeshesFadeIn(R, G, B, A, Rnew, Gnew, Bnew, Anew int, meshes []string) error{
+	if conn == nil {
+		return fmt.Errorf("websocket connection must not be nil")
+	}
+	
+	fmt.Printf("1\n")
+	Rsign := 1
+	Gsign := 1
+	Bsign := 1
+	Asign := 1
+	for R != Rnew || G != Gnew || B != Bnew || A != Anew {
+		fmt.Printf("%d, %d, %d, %d\n%d, %d, %d, %d\n%t, %t, %t, %t\n", R, G, B, A, Rnew, Gnew, Bnew, Anew, R != Rnew, G != Gnew, B != Bnew, A != Anew)
+		//time.Sleep(1 * time.Millisecond)
+		if R != Rnew {
+			R += Rsign
+			if R > 255 {
+				R = 254
+				Rsign = -1
+			}
+			if R < 0 {
+				R = 1
+				Rsign = 1
+			}
+		}
+		if G != Gnew {
+			G += Gsign
+			if G > 255 {
+				G = 254
+				Gsign = -1
+			}
+			if G < 0 {
+				G = 1
+				Gsign = 1
+			}
+		}
+		if B != Bnew {
+			B += Bsign
+			if B > 255 {
+				B = 254
+				Bsign = -1
+			}
+			if B < 0 {
+				B = 1
+				Bsign = 1
+			}
+		}
+		if A != Anew {
+			A += Asign
+			if A > 255 {
+				A = 254
+				Asign = -1
+			}
+			if A < 0 {
+				A = 1
+				Asign = 1
+			}
+		}
+		req := map[string]any{
+			"apiName":     "VTubeStudioPublicAPI",
+			"apiVersion":  "1.0",
+			"requestID":   fmt.Sprintf("tint-meshes-%d", time.Now().UnixNano()),
+			"messageType": "ColorTintRequest",
+			"data": map[string]any{
+				"colorTint": map[string]any{
+					"colorR": R,
+					"colorG": G,
+					"colorB": B,
+					"colorA": A,
+				},
+				"artMeshMatcher": map[string]any{
+					"tintAll": false,
+					"nameExact": meshes,
+				},
+			},
+		}
+
+		fmt.Printf("2\n")
+		//log.Printf("Sending meshes tint request: %s, %s, %s, %s, %v\n", req["apiName"], req["apiVersion"], req["requestID"], req["messageType"], req["data"])
+
+		res, err := sendWebsocketRequest(req)
+		if err != nil {
+			return err
+		}
+
+		if res.messageType != "ColorTintResponse" {
+			log.Default().Printf("Error: %v", res.data)
+			return fmt.Errorf("unexpected response type: %s", res.messageType)
+		}
+	}
+	
 	return nil
 }

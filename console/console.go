@@ -18,16 +18,17 @@ func Start(exitChan chan struct{}, c *client.Client) {
 
 	help_text := `=== Client_for_Donatex Console ===
 Commands:
-  tint <r> <g> <b> <a>                          - Tint model with specified RGBA color
-  tintmeshes <r> <g> <b> <a> <mesh1 mesh2...>   - Tint, but for choosed meshes
-  reqmeshes                                     - Get info about curent model meshes
-  getdonations <skip> <take> <hideTest>         - Get donations with pagination and test donation filter
-  update                                        - Update current hotkeys from VTube Studio
-  execute <id|name>                             - Execute a hotkey by ID or name
-  executetime <id|name> <seconds>               - Schedule a hotkey to execute for a certain time
-  remove <name>                                 - Remove a hotkey from the schedule
-  help                                          - Show this help message
-  exit                                          - Exit app
+  tint <r> <g> <b> <a>                            - Tint model with specified RGBA color
+  tintmeshes <r> <g> <b> <a> <mesh1> <mesh2>...   - Tint, but for choosed meshes
+  tintmeshesfadein <use comand to know>           - Tintmeshes, but with animation 
+  reqmeshes                                       - Get info about curent model meshes
+  getdonations <skip> <take> <hideTest>           - Get donations with pagination and test donation filter
+  update                                          - Update current hotkeys from VTube Studio
+  execute <id|name>                               - Execute a hotkey by ID or name
+  executetime <id|name> <seconds>                 - Schedule a hotkey to execute for a certain time
+  remove <name>                                   - Remove a hotkey from the schedule
+  help                                            - Show this help message
+  exit                                            - Exit app
 =====================`
 	fmt.Println(help_text)
 
@@ -62,7 +63,7 @@ Commands:
 
 		case "tintmeshes":
 			if len(parts) < 5 {
-				fmt.Println("Usage: tintmodel <r> <g> <b> <a>")
+				fmt.Println("Usage: tintmeshes <r> <g> <b> <a> <mesh1> <mesh2>...")
 				continue
 			}
 			r, err := strconv.Atoi(parts[1])
@@ -88,6 +89,55 @@ Commands:
 
 			meshes := parts[5:]
 			tintMeshesCMD(r, g, b, a, meshes)
+
+		case "tintmeshesfadein":
+			if len(parts) < 9 {
+				fmt.Println("Usage: tintmeshesfadein <r> <g> <b> <a> <rnew> <gnew> <bnew> <anew> <mesh1> <mesh2>...")
+				continue
+			}
+			r, err := strconv.Atoi(parts[1])
+			if err != nil {
+				fmt.Println("Invalid r value, should be an integer")
+				continue
+			}
+			g, err := strconv.Atoi(parts[2])
+			if err != nil {
+				fmt.Println("Invalid g value, should be an integer")
+				continue
+			}
+			b, err := strconv.Atoi(parts[3])
+			if err != nil {
+				fmt.Println("Invalid b value, should be an integer")
+				continue
+			}
+			a, err := strconv.Atoi(parts[4])
+			if err != nil {
+				fmt.Println("Invalid a value, should be an integer")
+				continue
+			}
+			rnew, err := strconv.Atoi(parts[5])
+			if err != nil {
+				fmt.Println("Invalid r value, should be an integer")
+				continue
+			}
+			gnew, err := strconv.Atoi(parts[6])
+			if err != nil {
+				fmt.Println("Invalid g value, should be an integer")
+				continue
+			}
+			bnew, err := strconv.Atoi(parts[7])
+			if err != nil {
+				fmt.Println("Invalid b value, should be an integer")
+				continue
+			}
+			anew, err := strconv.Atoi(parts[8])
+			if err != nil {
+				fmt.Println("Invalid a value, should be an integer")
+				continue
+			}
+
+			meshes := parts[9:]
+			go tintMeshesFadeInCMD(r, g, b, a, rnew, gnew, bnew, anew, meshes)
 
 		case "getdonations":
 			if len(parts) != 4 {
@@ -249,4 +299,14 @@ func tintMeshesCMD(r, g, b, a int, meshes []string){
 	}
 
 	fmt.Printf("✓ Tinted %0.f meshes with color RGBA(%d, %d, %d, %d)\n",resMeshes, r, g, b, a)
+}
+
+func tintMeshesFadeInCMD(R, G, B, A, Rnew, Gnew, Bnew, Anew int, meshes []string){
+	err := plugin.TintMeshesFadeIn(R, G, B, A, Rnew, Gnew, Bnew, Anew, meshes)
+	if err != nil {
+		fmt.Printf("Error: %v\n", err)
+		return
+	}
+
+	fmt.Printf("✓ Tinted meshes with animation and color RGBA(%d, %d, %d, %d)\n", R, G, B, A)
 }
