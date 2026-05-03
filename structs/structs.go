@@ -68,3 +68,27 @@ type ArtMeshInfo struct {
 	ArtMeshNames         []string
 	ArtMeshTags          []string
 }
+
+type Command struct {
+	Name  string      `yaml:"Name"`
+	Type  string      `yaml:"Type"`
+	Price float64     `yaml:"Price"`
+	Args  CommandArgs `yaml:"Args"`
+}
+
+type CommandArgs struct {
+	Tags []string `yaml:"Tags,omitempty"`
+	Id   string   `yaml:"Id,omitempty"`
+	Colors map[string]Color `yaml:",inline"`
+}
+
+type Color struct {
+	ListOfMeshes []string `yaml:"ListOfMeshes"`
+	R            int      `yaml:"R"`
+	G            int      `yaml:"G"`
+	B            int      `yaml:"B"`
+}
+
+type CommandList struct {
+	Commands map[string]Command `yaml:"Commands"`
+}

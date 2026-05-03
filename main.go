@@ -52,7 +52,14 @@ func main() {
 		return
 	}
 
-	log.Printf("Loaded config")
+	log.Printf("Load config")
+
+	commandList, err := config.LoadCommandList("list.yaml")
+	if err != nil {
+		log.Fatalf("Failed to load command list: %v", err)
+	}
+	log.Printf("Load command list")
+	fmt.Println(commandList)
 
 	c := client.NewClient(cfg.URL, secret.Token)
 

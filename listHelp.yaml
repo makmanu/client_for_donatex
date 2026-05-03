@@ -13,19 +13,22 @@
 
 # Example of list.yaml
 Commands:
-  Angry:
+  1325:
+    Name: "Angry"
     Type: "Hotkey"
     Price: "8"
     Args:
       Tags: []
       Id: "1623a123fe135bcc351"
-  Cat eyes:
+  3:
+    Name: "Cat eyes"
     Type: "Hotkey"
     Price: "3.3"
     Args:
       Tags: ["Right eye", "Left eye"]
       Id: "cbab151356f63161fee35672"
-  Red eyes:
+  1:
+    Name: "Red eyes"
     Type: "Tint"
     Price:  "4"
     Args:
@@ -34,7 +37,8 @@ Commands:
         R: 255
         G: 0
         B: 0
-  Bee hair:
+  215:
+    Name: "Bee hair"
     Type: "Tint"
     Price: "7"
     Args:

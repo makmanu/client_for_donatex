@@ -33,26 +33,6 @@ func GetRequestedHotkeysFromMessage(message string) (map[string]int, error) {
 	return result, nil
 }
 
-func DonationIsBigEnough(reqHotkeys map[string]int, donationAmount float64) (bool, error) {
-	var sum float64
-	for identifier, seconds := range reqHotkeys {
-		if seconds < DefaultPlanner.minimumDuration {
-			delete(reqHotkeys, identifier)
-			continue
-		}
-		hotkey, err := plugin.FindHotkeyInfoByIdentifier(identifier)
-		if err != nil {
-			fmt.Printf("Couldn't find hotkey with identifier '%s': %v\n", identifier, err)
-			delete(reqHotkeys, identifier)
-			continue
-		}
-		fmt.Printf("Hotkey %s with coefficient %.2f requested for %d seconds(%.2f roubles)\n", hotkey.Name, hotkey.Coefficient, seconds, hotkey.Coefficient * float64(seconds))
-		sum += hotkey.Coefficient * float64(seconds)
-	}
-	fmt.Printf("Requested amount %.2f, donated amount %.2f\n", sum, donationAmount)
-	return donationAmount >= sum, nil
-}
-
 func HandleDonation(donation structs.Donation) {
 	reqHotkeys, err := GetRequestedHotkeysFromMessage(donation.Message)
 		if err != nil {
@@ -64,10 +44,8 @@ func HandleDonation(donation structs.Donation) {
 		if len(reqHotkeys) > 0 {
 			donationAmount := 0.0
 			if donation.Currency == "RUB" {
-				fmt.Println(donation.Amount)
 				donationAmount = donation.Amount
 			} else {
-				fmt.Println("false")
 				donationAmount = donation.AmountInRub
 			}
 			fmt.Printf("? Donation amount: %.2f RUB\n", donationAmount)

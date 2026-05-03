@@ -54,19 +54,22 @@ defaultHotkeyCoefficient: 2.5`), 0644)
 
 # Example of list.yaml
 Commands:
-  Angry:
+  1325:
+    Name: "Angry"
     Type: "Hotkey"
     Price: "8"
     Args:
       Tags: []
       Id: "1623a123fe135bcc351"
-  Cat eyes:
+  3:
+    Name: "Cat eyes"
     Type: "Hotkey"
     Price: "3.3"
     Args:
       Tags: ["Right eye", "Left eye"]
       Id: "cbab151356f63161fee35672"
-  Red eyes:
+  1:
+    Name: "Red eyes"
     Type: "Tint"
     Price:  "4"
     Args:
@@ -75,7 +78,8 @@ Commands:
         R: 255
         G: 0
         B: 0
-  Bee hair:
+  215:
+    Name: "Bee hair"
     Type: "Tint"
     Price: "7"
     Args:
@@ -94,5 +98,52 @@ Commands:
 		}
 		log.Println("Created default listHelp.yaml")
 	}
+
+  if _, err := os.Stat("list.yaml"); os.IsNotExist(err) {
+		err := os.WriteFile("list.yaml", []byte(`Commands:
+  1325:
+    Name: "Angry"
+    Type: "Hotkey"
+    Price: "8"
+    Args:
+      Tags: []
+      Id: "1623a123fe135bcc351"
+  3:
+    Name: "Cat eyes"
+    Type: "Hotkey"
+    Price: "3.3"
+    Args:
+      Tags: ["Right eye", "Left eye"]
+      Id: "cbab151356f63161fee35672"
+  1:
+    Name: "Red eyes"
+    Type: "Tint"
+    Price:  "4"
+    Args:
+      Color1:
+        ListOfMeshes: ["ArtMesh1", "ArtMesh2", "ArtMesh63"]
+        R: 255
+        G: 0
+        B: 0
+  215:
+    Name: "Bee hair"
+    Type: "Tint"
+    Price: "7"
+    Args:
+      Black:
+        ListOfMeshes: ["ArtMesh53", "ArtMesh23", "ArtMesh523"]
+        R: 0
+        G: 0
+        B: 0
+      Yellow:
+        ListOfMeshes: ["ArtMesh246", "ArtMesh37", "ArtMesh262"]
+        R: 255
+        G: 255
+        B: 0`), 0644)
+    if err != nil {
+      return err
+    }
+    log.Println("Created default list.yaml")
+  }
 	return nil
 }

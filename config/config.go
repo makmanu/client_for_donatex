@@ -7,13 +7,16 @@ import (
 	"gopkg.in/yaml.v3"
 )
 
+var (
+	config           structs.Config
+	commandList		 *structs.CommandList
+)
+
 func LoadConfig(filename string) (*structs.Config, error) {
 	data, err := os.ReadFile(filename)
 	if err != nil {
 		return nil, err
 	}
-
-	var config structs.Config
 	err = yaml.Unmarshal(data, &config)
 	if err != nil {
 		return nil, err
@@ -35,4 +38,18 @@ func LoadSecret(filename string) (*structs.Secret, error) {
 	}
 
 	return &secret, nil
+}
+
+func LoadCommandList(filename string) (*structs.CommandList, error) {
+	data, err := os.ReadFile(filename)
+	if err != nil {
+		return nil, err
+	}
+
+	err = yaml.Unmarshal(data, &commandList)
+	if err != nil {
+		return nil, err
+	}
+
+	return commandList, nil
 }
