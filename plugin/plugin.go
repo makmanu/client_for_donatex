@@ -519,3 +519,40 @@ func TintMeshesFadeIn(R, G, B, Rnew, Gnew, Bnew int, meshes []string) error{
 	
 	return nil
 }
+
+func AskUserForMeshes() ([]string, error) {
+	if conn == nil {
+		return nil, fmt.Errorf("websocket connection must not be nil")
+	}
+	
+	req := map[string]any{
+			"apiName":     "VTubeStudioPublicAPI",
+			"apiVersion":  "1.0",
+			"requestID":   fmt.Sprintf("ask-for-meshes-%d", time.Now().UnixNano()),
+			"messageType": "ArtMeshSelectionRequest",
+			"data": map[string]any{
+				"textOverride": "Select meshes to return in program.",
+				"helpOverride": "Чё вылупился?",
+				"requestedArtMeshCount": 0,
+			},
+		}
+	
+	res, err := sendWebsocketRequest(req)
+	if err != nil {
+		return nil, err
+	}
+
+	if res.messageType != "ArtMeshSelectionResponse" {
+		return nil, fmt.Errorf("unexpected response type: %s", res.messageType)
+	}
+
+	if res.data["success"] == false {
+		return nil, fmt.Errorf("user cancelled mesh selection")
+	}
+
+	var meshes []string
+	for _, mesh := range res.data["activeArtMeshes"].([]any) {
+		meshes = append(meshes, mesh.(string))
+	}
+	return meshes, nil
+}

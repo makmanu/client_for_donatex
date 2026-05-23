@@ -19,12 +19,13 @@ func Start(exitChan chan struct{}, c *client.Client) {
 
 	help_text := `=== Client_for_Donatex Console ===
 Commands:
+  selectmeshes                                    - return selected meshes in VTubeStudio
   tint <r> <g> <b> <a>                            - Tint model with specified RGBA color
   tintmeshes <r> <g> <b> <a> <mesh1> <mesh2>...   - Tint, but for choosed meshes
   tintmeshesfadein <use command to know>          - Tintmeshes, but with animation 
   reqmeshes                                       - Get info about curent model meshes
   getdonations <skip> <take> <hideTest>           - Get donations with pagination and test donation filter
-  update                                          - Update current hotkeys from VTube Studio
+  update                                          - Update current hotkeys from VTubeStudio
   execute <id>                                    - Execute a hotkey by ID or name
   executetime <id> <seconds>                      - Schedule a hotkey to execute for a certain time
   remove <name>                                   - Remove a hotkey from the schedule
@@ -61,6 +62,9 @@ Commands:
 
 		case "reqmeshes":
 			reqMeshesCMD()
+
+		case "selectmeshes":
+			selectMeshesCMD()
 
 		case "tintmeshes":
 			if len(parts) < 4 {
@@ -331,4 +335,17 @@ func tintMeshesFadeInCMD(R, G, B, Rnew, Gnew, Bnew int, meshes []string){
 	}
 
 	fmt.Printf("✓ Tinted meshes with animation and color RGBA(%d, %d, %d, %d)\n", R, G, B, 255)
+}
+
+func selectMeshesCMD() {
+	meshes, err := plugin.AskUserForMeshes()
+	if err != nil {
+		fmt.Printf("Error: %v\n", err)
+		return
+	}
+	for i, mesh := range meshes {
+		meshes[i] = fmt.Sprintf("\"%s\"", mesh)
+	}
+
+	fmt.Printf("✓ Selected meshes: [%s]\n", strings.Join(meshes, ", "))
 }

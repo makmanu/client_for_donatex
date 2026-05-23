@@ -8,6 +8,7 @@ token
 hotkeys.yaml
 list.yaml
 *.log
+scheduleScreen.txt
 
 # Binaries for programs and plugins
 *.exe
