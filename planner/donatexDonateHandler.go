@@ -96,13 +96,11 @@ func HandleRequest(identifier string, args []string, money float64) (remains flo
 				return money
 			}
 			for colorName, color := range command.Args.Colors {
-				go func() {
-					err := DefaultPlanner.AddTintToSchedule(colorName, color.R, color.G, color.B, seconds, color.ListOfMeshes)
-					if err != nil {
-						fmt.Printf("Error: %v\n", err)
-						return
-					}
-				}()
+				err := DefaultPlanner.AddTintToSchedule(colorName, color.R, color.G, color.B, seconds, color.ListOfMeshes)
+				if err != nil {
+					fmt.Printf("Error: %v\n", err)
+					return money
+				}
 			}
 			return money - (float64(command.Price) * float64(seconds))
 		default:

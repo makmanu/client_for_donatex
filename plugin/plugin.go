@@ -439,46 +439,52 @@ func RequestArtMeshList() error {
 	return nil
 }
 
+func absInt(x int) int {
+	if x < 0 {
+		return -x
+	}
+	return x
+}
+
 func TintMeshesFadeIn(R, G, B, Rnew, Gnew, Bnew int, meshes []string) error{
 	if conn == nil {
 		return fmt.Errorf("websocket connection must not be nil")
 	}
-	
-	Rsign := 1
-	Gsign := 1
-	Bsign := 1
-	for R != Rnew || G != Gnew || B != Bnew {
-		if R != Rnew {
+	Rsign := 5
+	Gsign := 5
+	Bsign := 5
+	for absInt(R - Rnew) > 5 || absInt(G - Gnew) > 5 || absInt(B - Bnew) > 5 {
+		if absInt(R - Rnew) > 5 {
 			R += Rsign
 			if R > 255 {
 				R = 254
-				Rsign = -1
+				Rsign = -5
 			}
 			if R < 0 {
 				R = 1
-				Rsign = 1
+				Rsign = 5
 			}
 		}
-		if G != Gnew {
+		if absInt(G - Gnew) > 5 {
 			G += Gsign
 			if G > 255 {
 				G = 254
-				Gsign = -1
+				Gsign = -5
 			}
 			if G < 0 {
 				G = 1
-				Gsign = 1
+				Gsign = 5
 			}
 		}
-		if B != Bnew {
+		if absInt(B - Bnew) > 5 {
 			B += Bsign
 			if B > 255 {
 				B = 254
-				Bsign = -1
+				Bsign = -5
 			}
 			if B < 0 {
 				B = 1
-				Bsign = 1
+				Bsign = 5
 			}
 		}
 		req := map[string]any{

@@ -16,7 +16,7 @@ VTubeStudio:
   port: 14141
   url: "ws://localhost"
 minimumDuration: 2
-maximumHotkeysPerDonation: 20
+maximumRequestsPerDonation: 20
 defaultHotkeyCoefficient: 2.5`), 0644)
 		if err != nil {
 			return err
@@ -57,21 +57,19 @@ Commands:
   Angry:
     Name: "Angry"
     Type: "Hotkey"
-    Price: "8"
+    Price: 8
     Args:
-      Tags: []
-      Id: "1623a123fe135bcc351"
+      Id: "349e5f8b62bf43bb8e47fabefd56257a"
   Cat_eyes:
     Name: "Cat eyes"
     Type: "Hotkey"
-    Price: "3.3"
+    Price: 3.3
     Args:
-      Tags: ["Right eye", "Left eye"]
-      Id: "cbab151356f63161fee35672"
+      Id: "bed2c8c430ef41318a5ca63fd6383950"
   Red_eyes:
     Name: "Red eyes"
     Type: "Tint"
-    Price:  "4"
+    Price:  4
     Args:
       Color1:
         ListOfMeshes: ["ArtMesh1", "ArtMesh2", "ArtMesh63"]
@@ -81,17 +79,32 @@ Commands:
   Bee_hair:
     Name: "Bee hair"
     Type: "Tint"
-    Price: "7"
+    Price: 7
     Args:
       Black:
-        ListOfMeshes: ["ArtMesh53", "ArtMesh23", "ArtMesh523"]
+        ListOfMeshes: ["ArtMesh115", "ArtMesh117"]
         R: 0
         G: 0
         B: 0
       Yellow:
-        ListOfMeshes: ["ArtMesh246", "ArtMesh37", "ArtMesh262"]
+        ListOfMeshes: ["ArtMesh114", "ArtMesh123"]
         R: 255
         G: 255
+        B: 0
+  Black_red_hair:
+    Name: "Black red hair"
+    Type: "Tint"
+    Price: 7
+    Args:
+      Black:
+        ListOfMeshes: ["ArtMesh115", "ArtMesh117"]
+        R: 0
+        G: 0
+        B: 0
+      Red:
+        ListOfMeshes: ["ArtMesh114", "ArtMesh123"]
+        R: 255
+        G: 0
         B: 0`), 0644)
 		if err != nil {
 			return err
@@ -101,24 +114,23 @@ Commands:
 
   if _, err := os.Stat("list.yaml"); os.IsNotExist(err) {
 		err := os.WriteFile("list.yaml", []byte(`Commands:
+  Commands:
   Angry:
     Name: "Angry"
     Type: "Hotkey"
-    Price: "8"
+    Price: 8
     Args:
-      Tags: []
-      Id: "1623a123fe135bcc351"
+      Id: "349e5f8b62bf43bb8e47fabefd56257a"
   Cat_eyes:
     Name: "Cat eyes"
     Type: "Hotkey"
-    Price: "3.3"
+    Price: 3.3
     Args:
-      Tags: ["Right eye", "Left eye"]
-      Id: "cbab151356f63161fee35672"
+      Id: "bed2c8c430ef41318a5ca63fd6383950"
   Red_eyes:
     Name: "Red eyes"
     Type: "Tint"
-    Price:  "4"
+    Price:  4
     Args:
       Color1:
         ListOfMeshes: ["ArtMesh1", "ArtMesh2", "ArtMesh63"]
@@ -128,17 +140,32 @@ Commands:
   Bee_hair:
     Name: "Bee hair"
     Type: "Tint"
-    Price: "7"
+    Price: 7
     Args:
       Black:
-        ListOfMeshes: ["ArtMesh53", "ArtMesh23", "ArtMesh523"]
+        ListOfMeshes: ["ArtMesh115", "ArtMesh117"]
         R: 0
         G: 0
         B: 0
       Yellow:
-        ListOfMeshes: ["ArtMesh246", "ArtMesh37", "ArtMesh262"]
+        ListOfMeshes: ["ArtMesh114", "ArtMesh123"]
         R: 255
         G: 255
+        B: 0
+  Black_red_hair:
+    Name: "Black red hair"
+    Type: "Tint"
+    Price: 7
+    Args:
+      Black:
+        ListOfMeshes: ["ArtMesh115", "ArtMesh117"]
+        R: 0
+        G: 0
+        B: 0
+      Red:
+        ListOfMeshes: ["ArtMesh114", "ArtMesh123"]
+        R: 255
+        G: 0
         B: 0`), 0644)
     if err != nil {
       return err
