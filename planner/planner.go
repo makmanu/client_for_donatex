@@ -11,18 +11,18 @@ import (
 )
 
 type Planner struct {
-	minimumDuration           int
-	maximumHotkeysPerDonation int
-	plannerCh                 chan structs.PlannerSignal
-	ticker                    *time.Ticker
-	schedule                  map[string]*structs.ScheduleItem
-	oldSchedule               map[string]time.Duration
-	scheduleScreen            *os.File
+	minimumDuration            int
+	maximumRequestsPerDonation int
+	plannerCh                  chan structs.PlannerSignal
+	ticker                     *time.Ticker
+	schedule                   map[string]*structs.ScheduleItem
+	oldSchedule                map[string]time.Duration
+	scheduleScreen             *os.File
 }
 
 var DefaultPlanner *Planner
 
-func NewPlanner(minimumDuration, maximumHotkeysPerDonation int) *Planner {
+func NewPlanner(minimumDuration, maximumRequestsPerDonation int) *Planner {
 	plannerCh := make(chan structs.PlannerSignal)
 	Screen, err := os.OpenFile("scheduleScreen.txt", os.O_CREATE|os.O_WRONLY, 0644)
 	if err != nil {
@@ -31,13 +31,13 @@ func NewPlanner(minimumDuration, maximumHotkeysPerDonation int) *Planner {
 		Screen.WriteString("Current schedule:\n")
 	}
 	DefaultPlanner = &Planner{
-		maximumHotkeysPerDonation: maximumHotkeysPerDonation,
-		minimumDuration:           minimumDuration,
-		plannerCh:                 plannerCh,
-		ticker:                    time.NewTicker(100 * time.Millisecond),
-		schedule:                  make(map[string]*structs.ScheduleItem),
-		oldSchedule:               make(map[string]time.Duration),
-		scheduleScreen:            Screen,
+		maximumRequestsPerDonation: maximumRequestsPerDonation,
+		minimumDuration:           	minimumDuration,
+		plannerCh:                 	plannerCh,
+		ticker:                    	time.NewTicker(100 * time.Millisecond),
+		schedule:                  	make(map[string]*structs.ScheduleItem),
+		oldSchedule:               	make(map[string]time.Duration),
+		scheduleScreen:            	Screen,
 	}
 	return DefaultPlanner
 }
@@ -113,46 +113,69 @@ func (p *Planner) RemoveItemFromSchedule(itemNameToRemove string) error {
 
 	for itemName := range p.schedule {
 		if itemName == itemNameToRemove {
-			err := p.schedule[itemName].FunctionToStop(p.schedule[itemName].ArgsforStop...)
-			if err != nil {
-				log.Printf("Error executing function: %v", err)
+			item := p.schedule[itemName]
+			if item != nil && item.FunctionToStop != nil {
+				go func(it *structs.ScheduleItem) {
+					err := it.FunctionToStop(it.ArgsforStop...)
+					if err != nil {
+						log.Printf("Error executing function: %v", err)
+					}
+				}(item)
 			}
 			delete(p.schedule, itemName)
 			delete(p.oldSchedule, itemName)
 			fmt.Printf("Removed item %s from schedule\n", itemName)
-			return err
+			return nil
 		}
 	}
 	fmt.Printf("Item '%s' not found in schedule", itemNameToRemove)
 	return nil
 }
 
-func (p *Planner) AddHotkeyToSchedule(identifier string, seconds int) error {
-	hotkey, err := plugin.FindHotkeyInfoByIdentifier(identifier)
-	if err != nil {
-		return fmt.Errorf("Couldn't find hotkey with identifier '%s': %v", identifier, err)
-	}
+func (p *Planner) AddHotkeyToSchedule(name string, hotkeyId string, seconds int) error {
 	item := &structs.ScheduleItem{
-		Name:           hotkey.Name,
-		ArgsforExecute: []any{hotkey},
-		ArgsforStop:    []any{hotkey},
+		Name:           name,
+		ArgsforExecute: []any{hotkeyId},
+		ArgsforStop:    []any{hotkeyId},
 		FunctionToExecute: func(args ...any) error {
-			return plugin.ExecuteHotkey(args[0].(structs.Hotkey))
+			return plugin.ExecuteHotkey(args[0].(string))
 		},
 		FunctionToStop: func(args ...any) error {
-			return plugin.ExecuteHotkey(args[0].(structs.Hotkey))
+			return plugin.ExecuteHotkey(args[0].(string))
 		},
 		DurationinSeconds: seconds,
 		ExpiresAt: time.Now(),
 	}
-	err = p.AddItemToSchedule(item)
+	err := p.AddItemToSchedule(item)
 	if err != nil {
 		return fmt.Errorf("Error adding hotkey to schedule: %w", err)
 	}
-	log.Printf("Added hotkey %s for %d seconds to schedule\n", identifier, seconds)
+	log.Printf("Added hotkey %s for %d seconds to schedule\n", hotkeyId, seconds)
 	return nil
 }
 
-func (p *Planner) RemoveHotkeyFromSchedule(hotkey structs.Hotkey) error {
-	return p.RemoveItemFromSchedule(hotkey.Name)
+func (p *Planner) RemoveHotkeyFromSchedule(name string) error {
+	return p.RemoveItemFromSchedule(name)
+}
+
+func (p *Planner) AddTintToSchedule(name string, r, g, b int, seconds int, meshes []string) error {
+	item := &structs.ScheduleItem{
+		Name: name,
+		ArgsforExecute: []any{r, g, b, meshes},
+		ArgsforStop:    []any{r, g, b, meshes},
+		FunctionToExecute: func(args ...any) error {
+			return plugin.TintMeshesFadeIn(255, 255, 255, args[0].(int), args[1].(int), args[2].(int), args[3].([]string))
+		},
+		FunctionToStop: func(args ...any) error {
+			return plugin.TintMeshesFadeIn(args[0].(int), args[1].(int), args[2].(int), 255, 255, 255, args[3].([]string))
+		},
+		DurationinSeconds: seconds,
+		ExpiresAt: time.Now(),
+	}
+	err := p.AddItemToSchedule(item)
+	if err != nil {
+		return fmt.Errorf("Error adding tint to schedule: %w", err)
+	}
+	log.Printf("Added tint RGBA(%d, %d, %d, %d) for %d seconds to schedule\n", r, g, b, 255, seconds)
+	return nil
 }

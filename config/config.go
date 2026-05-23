@@ -9,7 +9,7 @@ import (
 
 var (
 	config           structs.Config
-	commandList		 *structs.CommandList
+	CommandList		 *structs.CommandList
 )
 
 func LoadConfig(filename string) (*structs.Config, error) {
@@ -46,10 +46,9 @@ func LoadCommandList(filename string) (*structs.CommandList, error) {
 		return nil, err
 	}
 
-	err = yaml.Unmarshal(data, &commandList)
+	err = yaml.Unmarshal(data, &CommandList)
 	if err != nil {
 		return nil, err
 	}
-
-	return commandList, nil
+	return CommandList, nil
 }

@@ -1,7 +1,6 @@
 # Available types
 #   Hotkey - any hotkey from VTS.
-#     In Args accepts tags, id. 
-#     Tags optional. hotkeys with same tags wont play simultaniosly.
+#     In Args accepts id.
 #     id mandatory. its hotkeyid.
 #   Tint - change color for selected meshes
 #     In Args accepts any amount of Colors, that should contain: listOfMeshes, R, G, B.
@@ -13,21 +12,19 @@
 
 # Example of list.yaml
 Commands:
-  1325:
+  Angry:
     Name: "Angry"
     Type: "Hotkey"
     Price: "8"
     Args:
-      Tags: []
       Id: "1623a123fe135bcc351"
-  3:
+  Cat_eyes:
     Name: "Cat eyes"
     Type: "Hotkey"
     Price: "3.3"
     Args:
-      Tags: ["Right eye", "Left eye"]
       Id: "cbab151356f63161fee35672"
-  1:
+  Red_eyes:
     Name: "Red eyes"
     Type: "Tint"
     Price:  "4"
@@ -37,7 +34,7 @@ Commands:
         R: 255
         G: 0
         B: 0
-  215:
+  Bee_hair:
     Name: "Bee hair"
     Type: "Tint"
     Price: "7"

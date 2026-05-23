@@ -8,6 +8,7 @@ import (
 	"strings"
 
 	"github.com/makmanu/client_for_donatex/client"
+	"github.com/makmanu/client_for_donatex/config"
 	"github.com/makmanu/client_for_donatex/planner"
 	"github.com/makmanu/client_for_donatex/plugin"
 )
@@ -24,8 +25,8 @@ Commands:
   reqmeshes                                       - Get info about curent model meshes
   getdonations <skip> <take> <hideTest>           - Get donations with pagination and test donation filter
   update                                          - Update current hotkeys from VTube Studio
-  execute <id|name>                               - Execute a hotkey by ID or name
-  executetime <id|name> <seconds>                 - Schedule a hotkey to execute for a certain time
+  execute <id>                                    - Execute a hotkey by ID or name
+  executetime <id> <seconds>                      - Schedule a hotkey to execute for a certain time
   remove <name>                                   - Remove a hotkey from the schedule
   help                                            - Show this help message
   exit                                            - Exit app
@@ -50,20 +51,20 @@ Commands:
 
 		switch command {
 		case "executetime":
-			if len(parts) < 3 {
-				fmt.Println("Usage: executetime <id|name> <seconds>")
+			if len(parts) != 3 {
+				fmt.Println("Usage: executetime <id> <seconds>")
 				continue
 			}
-			identifierCmd := strings.Join(parts[1:len(parts)-1], " ")
-			secondsCmd := parts[len(parts)-1]
-			executetimeCmd(identifierCmd, secondsCmd)
+			identifierCmd := parts[1]
+			seconds := parts[2]
+			executetimeCmd(identifierCmd, seconds)
 
 		case "reqmeshes":
 			reqMeshesCMD()
 
 		case "tintmeshes":
-			if len(parts) < 5 {
-				fmt.Println("Usage: tintmeshes <r> <g> <b> <a> <mesh1> <mesh2>...")
+			if len(parts) < 4 {
+				fmt.Println("Usage: tintmeshes <r> <g> <b> <mesh1> <mesh2>...")
 				continue
 			}
 			r, err := strconv.Atoi(parts[1])
@@ -79,20 +80,15 @@ Commands:
 			b, err := strconv.Atoi(parts[3])
 			if err != nil {
 				fmt.Println("Invalid b value, should be an integer")
-				continue
-			}
-			a, err := strconv.Atoi(parts[4])
-			if err != nil {
-				fmt.Println("Invalid a value, should be an integer")
 				continue
 			}
 
 			meshes := parts[5:]
-			tintMeshesCMD(r, g, b, a, meshes)
+			tintMeshesCMD(r, g, b, meshes)
 
 		case "tintmeshesfadein":
 			if len(parts) < 9 {
-				fmt.Println("Usage: tintmeshesfadein <r> <g> <b> <a> <rnew> <gnew> <bnew> <anew> <mesh1> <mesh2>...")
+				fmt.Println("Usage: tintmeshesfadein <r> <g> <b> <rnew> <gnew> <bnew> <mesh1> <mesh2>...")
 				continue
 			}
 			r, err := strconv.Atoi(parts[1])
@@ -108,11 +104,6 @@ Commands:
 			b, err := strconv.Atoi(parts[3])
 			if err != nil {
 				fmt.Println("Invalid b value, should be an integer")
-				continue
-			}
-			a, err := strconv.Atoi(parts[4])
-			if err != nil {
-				fmt.Println("Invalid a value, should be an integer")
 				continue
 			}
 			rnew, err := strconv.Atoi(parts[5])
@@ -130,14 +121,9 @@ Commands:
 				fmt.Println("Invalid b value, should be an integer")
 				continue
 			}
-			anew, err := strconv.Atoi(parts[8])
-			if err != nil {
-				fmt.Println("Invalid a value, should be an integer")
-				continue
-			}
 
 			meshes := parts[9:]
-			go tintMeshesFadeInCMD(r, g, b, a, rnew, gnew, bnew, anew, meshes)
+			go tintMeshesFadeInCMD(r, g, b, rnew, gnew, bnew, meshes)
 
 		case "getdonations":
 			if len(parts) != 4 {
@@ -162,12 +148,12 @@ Commands:
 			getDonationsCmd(c, skip, take, hideTest)
 
 		case "execute":
-			if len(parts) < 2 {
-				fmt.Println("Usage: execute <id|name>")
+			if len(parts) != 2 {
+				fmt.Println("Usage: execute <id>")
 				continue
 			}
-			identifier := strings.Join(parts[1:], " ")
-			executeHotkeyCmd(identifier)
+			identifier := parts[1]
+			executeCmd(identifier)
 		
 		case "tint":
 			if len(parts) != 5 {
@@ -221,16 +207,32 @@ Commands:
 	}
 }
 
-func executeHotkeyCmd(identifier string) {
-	hotkey, err := plugin.FindHotkeyInfoByIdentifier(identifier)
-	if err != nil {
-		fmt.Printf("Error: %v\n", err)
+func executeCmd(identifier string) {
+	command, ok := config.CommandList.Commands[identifier]
+	if !ok {
+		fmt.Printf("Unknown command identifier '%s', can't execute\n", identifier)
 		return
 	}
-	if err := plugin.ExecuteHotkey(hotkey); err != nil {
-		fmt.Printf("Error: %v\n", err)
-	} else {
-		fmt.Printf("✓ Executed hotkey: %s\n", hotkey.Name)
+	switch command.Type {
+	case "Hotkey":
+		hotkeyId := command.Args.Id
+		if err := plugin.ExecuteHotkey(hotkeyId); err != nil {
+			fmt.Printf("Error: %v\n", err)
+		} else {
+			fmt.Printf("✓ Executed hotkey: %s\n", hotkeyId)
+		}
+	case "Tint":
+		for colorName, color := range command.Args.Colors {
+			err := plugin.TintMeshesFadeIn(255, 255, 255, color.R, color.G, color.B, color.ListOfMeshes)
+			if err != nil {
+				fmt.Printf("Error executing tint for color '%s': %v\n", colorName, err)
+			} else {
+				fmt.Printf("✓ Executed tint command for color '%s'\n", colorName)
+			}
+		}
+	default:
+		fmt.Printf("Command with id '%s' has unknown type '%s', can't execute\n", identifier, command.Type)
+		return
 	}
 }
 
@@ -250,19 +252,39 @@ func getDonationsCmd(c *client.Client, skip, take int, hideTest string) {
 	}
 }
 
-func executetimeCmd(key string, time string) {
+func executetimeCmd(identifier string, time string) {
 	time_in_seconds, err := strconv.Atoi(time)
 	if err != nil {
 		fmt.Println("Invalid time value, should be an number")
 		return
 	}
-	err = planner.DefaultPlanner.AddHotkeyToSchedule(key, time_in_seconds)
-	if err != nil {
-		fmt.Printf("Error: %v\n", err)
+
+	command, ok := config.CommandList.Commands[identifier]
+	if  !ok {
+		fmt.Printf("Command with id '%s' not found\n", identifier)
+		return
+	}
+	switch command.Type {
+	case "Hotkey":
+		err = planner.DefaultPlanner.AddHotkeyToSchedule(identifier, command.Args.Id, time_in_seconds)
+		if err != nil {
+			fmt.Printf("Error: %v\n", err)
+			return
+		}
+	case "Tint":
+		for colorName, color := range command.Args.Colors {
+			err = planner.DefaultPlanner.AddTintToSchedule(colorName, color.R, color.G, color.B, time_in_seconds, color.ListOfMeshes)
+			if err != nil {
+				fmt.Printf("Error: %v\n", err)
+				return
+			}
+		}
+	default:
+		fmt.Printf("Command with id '%s' has unknown type '%s', can't be scheduled\n", identifier, command.Type)
 		return
 	}
 
-	fmt.Printf("✓ Added hotkey %s to schedule to execute for %d seconds\n", key, time_in_seconds)
+	fmt.Printf("✓ Added hotkey %s to schedule to execute for %d seconds\n", identifier, time_in_seconds)
 }
 
 func removeItemFromScheduleCmd(itemName string) {
@@ -291,22 +313,22 @@ func reqMeshesCMD() {
 	}
 }
 
-func tintMeshesCMD(r, g, b, a int, meshes []string){
-	err, resMeshes := plugin.TintMeshes(r, g, b, a, meshes)
+func tintMeshesCMD(r, g, b int, meshes []string){
+	err := plugin.TintMeshes(r, g, b, meshes)
 	if err != nil {
 		fmt.Printf("Error: %v\n", err)
 		return
 	}
 
-	fmt.Printf("✓ Tinted %0.f meshes with color RGBA(%d, %d, %d, %d)\n",resMeshes, r, g, b, a)
+	fmt.Printf("✓ Tinted some meshes with color RGBA(%d, %d, %d, %d)\n", r, g, b, 255)
 }
 
-func tintMeshesFadeInCMD(R, G, B, A, Rnew, Gnew, Bnew, Anew int, meshes []string){
-	err := plugin.TintMeshesFadeIn(R, G, B, A, Rnew, Gnew, Bnew, Anew, meshes)
+func tintMeshesFadeInCMD(R, G, B, Rnew, Gnew, Bnew int, meshes []string){
+	err := plugin.TintMeshesFadeIn(R, G, B, Rnew, Gnew, Bnew, meshes)
 	if err != nil {
 		fmt.Printf("Error: %v\n", err)
 		return
 	}
 
-	fmt.Printf("✓ Tinted meshes with animation and color RGBA(%d, %d, %d, %d)\n", R, G, B, A)
+	fmt.Printf("✓ Tinted meshes with animation and color RGBA(%d, %d, %d, %d)\n", R, G, B, 255)
 }

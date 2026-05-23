@@ -12,8 +12,7 @@ type Config struct {
 	URL                        string            `yaml:"url"`
 	VTubeStudio                VTubeStudioConfig `yaml:"VTubeStudio"`
 	MinimumDuration            int               `yaml:"minimumDuration"`
-	MaximumHotkeysPerDonation  int               `yaml:"maximumHotkeysPerDonation"`
-	DefaultCoefficient         float64           `yaml:"defaultHotkeyCoefficient"`
+	MaximumRequestsPerDonation int               `yaml:"maximumRequestsPerDonation"`
 }
 
 type Secret struct {

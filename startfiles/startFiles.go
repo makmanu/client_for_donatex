@@ -54,21 +54,21 @@ defaultHotkeyCoefficient: 2.5`), 0644)
 
 # Example of list.yaml
 Commands:
-  1325:
+  Angry:
     Name: "Angry"
     Type: "Hotkey"
     Price: "8"
     Args:
       Tags: []
       Id: "1623a123fe135bcc351"
-  3:
+  Cat_eyes:
     Name: "Cat eyes"
     Type: "Hotkey"
     Price: "3.3"
     Args:
       Tags: ["Right eye", "Left eye"]
       Id: "cbab151356f63161fee35672"
-  1:
+  Red_eyes:
     Name: "Red eyes"
     Type: "Tint"
     Price:  "4"
@@ -78,7 +78,7 @@ Commands:
         R: 255
         G: 0
         B: 0
-  215:
+  Bee_hair:
     Name: "Bee hair"
     Type: "Tint"
     Price: "7"
@@ -101,21 +101,21 @@ Commands:
 
   if _, err := os.Stat("list.yaml"); os.IsNotExist(err) {
 		err := os.WriteFile("list.yaml", []byte(`Commands:
-  1325:
+  Angry:
     Name: "Angry"
     Type: "Hotkey"
     Price: "8"
     Args:
       Tags: []
       Id: "1623a123fe135bcc351"
-  3:
+  Cat_eyes:
     Name: "Cat eyes"
     Type: "Hotkey"
     Price: "3.3"
     Args:
       Tags: ["Right eye", "Left eye"]
       Id: "cbab151356f63161fee35672"
-  1:
+  Red_eyes:
     Name: "Red eyes"
     Type: "Tint"
     Price:  "4"
@@ -125,7 +125,7 @@ Commands:
         R: 255
         G: 0
         B: 0
-  215:
+  Bee_hair:
     Name: "Bee hair"
     Type: "Tint"
     Price: "7"

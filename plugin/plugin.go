@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"log"
 	"os"
-	"strconv"
 	"strings"
 	"sync"
 	"time"
@@ -299,23 +298,10 @@ func GetCurrentHotkeys() error {
 	return nil
 }
 
-func ExecuteHotkey(targetHotkey structs.Hotkey) error {
+func ExecuteHotkey(HotkeyId string) error {
 	if conn == nil {
 		return fmt.Errorf("websocket connection must not be nil")
 	}
-
-	// Read hotkeys.yaml
-	yamlData, err := os.ReadFile("hotkeys.yaml")
-	if err != nil {
-		return fmt.Errorf("failed to read hotkeys.yaml: %w", err)
-	}
-
-	
-	if err := yaml.Unmarshal(yamlData, &hotkeysResp); err != nil {
-		return fmt.Errorf("failed to unmarshal hotkeys.yaml: %w", err)
-	}
- 
-	targetHotkeyID := targetHotkey.HotkeyID
 
 	req := map[string]any{
 		"apiName":     "VTubeStudioPublicAPI",
@@ -323,7 +309,7 @@ func ExecuteHotkey(targetHotkey structs.Hotkey) error {
 		"requestID":   fmt.Sprintf("execute-hotkey-%d", time.Now().UnixNano()),
 		"messageType": "HotkeyTriggerRequest",
 		"data": map[string]any{
-			"hotkeyID": targetHotkeyID,
+			"hotkeyID": HotkeyId,
 		},
 	}
 
@@ -341,22 +327,6 @@ func ExecuteHotkey(targetHotkey structs.Hotkey) error {
 
 	return nil
 }
-
-func FindHotkeyInfoByIdentifier(identifier string) (structs.Hotkey, error) {
-	found := false
-	targetHotkey := structs.Hotkey{}
-	for _, hotkey := range hotkeysResp.AvailableHotkeys {
-		if strconv.Itoa(hotkey.ID) == identifier || hotkey.Name == identifier {
-			targetHotkey = hotkey
-			found = true
-			break
-		}
-	}
-	if !found {
-		return structs.Hotkey{}, fmt.Errorf("hotkey with identifier '%s' not found", identifier)
-	}
-	return targetHotkey, nil
- }
 
 func TintModel(R, G, B, A int) error {
 	if conn == nil {
@@ -397,9 +367,9 @@ func TintModel(R, G, B, A int) error {
 	return nil
 }
 
-func TintMeshes(R, G, B, A int, meshes []string) (error, float64) {
+func TintMeshes(R, G, B int, meshes []string) error {
 	if conn == nil {
-		return fmt.Errorf("websocket connection must not be nil"), 0
+		return fmt.Errorf("websocket connection must not be nil")
 	}
 	
 	req := map[string]any{
@@ -412,7 +382,7 @@ func TintMeshes(R, G, B, A int, meshes []string) (error, float64) {
 				"colorR": R,
 				"colorG": G,
 				"colorB": B,
-				"colorA": A,
+				"colorA": 255,
 				"mixWithSceneLightingColor": 0.5,
 			},
 			"artMeshMatcher": map[string]any{
@@ -426,15 +396,15 @@ func TintMeshes(R, G, B, A int, meshes []string) (error, float64) {
 
 	res, err := sendWebsocketRequest(req)
 	if err != nil {
-		return err, 0
+		return err
 	}
 
 	if res.messageType != "ColorTintResponse" {
 		log.Default().Printf("Error: %v", res.data)
-		return fmt.Errorf("unexpected response type: %s", res.messageType), 0
+		return fmt.Errorf("unexpected response type: %s", res.messageType)
 	}
 	
-	return nil, res.data["matchedArtMeshes"].(float64)
+	return nil
 }
 
 func RequestArtMeshList() error {
@@ -469,19 +439,15 @@ func RequestArtMeshList() error {
 	return nil
 }
 
-func TintMeshesFadeIn(R, G, B, A, Rnew, Gnew, Bnew, Anew int, meshes []string) error{
+func TintMeshesFadeIn(R, G, B, Rnew, Gnew, Bnew int, meshes []string) error{
 	if conn == nil {
 		return fmt.Errorf("websocket connection must not be nil")
 	}
 	
-	fmt.Printf("1\n")
 	Rsign := 1
 	Gsign := 1
 	Bsign := 1
-	Asign := 1
-	for R != Rnew || G != Gnew || B != Bnew || A != Anew {
-		fmt.Printf("%d, %d, %d, %d\n%d, %d, %d, %d\n%t, %t, %t, %t\n", R, G, B, A, Rnew, Gnew, Bnew, Anew, R != Rnew, G != Gnew, B != Bnew, A != Anew)
-		//time.Sleep(1 * time.Millisecond)
+	for R != Rnew || G != Gnew || B != Bnew {
 		if R != Rnew {
 			R += Rsign
 			if R > 255 {
@@ -515,17 +481,6 @@ func TintMeshesFadeIn(R, G, B, A, Rnew, Gnew, Bnew, Anew int, meshes []string) e
 				Bsign = 1
 			}
 		}
-		if A != Anew {
-			A += Asign
-			if A > 255 {
-				A = 254
-				Asign = -1
-			}
-			if A < 0 {
-				A = 1
-				Asign = 1
-			}
-		}
 		req := map[string]any{
 			"apiName":     "VTubeStudioPublicAPI",
 			"apiVersion":  "1.0",
@@ -536,7 +491,7 @@ func TintMeshesFadeIn(R, G, B, A, Rnew, Gnew, Bnew, Anew int, meshes []string) e
 					"colorR": R,
 					"colorG": G,
 					"colorB": B,
-					"colorA": A,
+					"colorA": 255,
 				},
 				"artMeshMatcher": map[string]any{
 					"tintAll": false,
@@ -544,9 +499,6 @@ func TintMeshesFadeIn(R, G, B, A, Rnew, Gnew, Bnew, Anew int, meshes []string) e
 				},
 			},
 		}
-
-		fmt.Printf("2\n")
-		//log.Printf("Sending meshes tint request: %s, %s, %s, %s, %v\n", req["apiName"], req["apiVersion"], req["requestID"], req["messageType"], req["data"])
 
 		res, err := sendWebsocketRequest(req)
 		if err != nil {

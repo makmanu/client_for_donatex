@@ -59,7 +59,8 @@ func main() {
 		log.Fatalf("Failed to load command list: %v", err)
 	}
 	log.Printf("Load command list")
-	fmt.Println(commandList)
+	log.Println(commandList)
+	fmt.Println(commandList.Commands["1325"].Args.Id)
 
 	c := client.NewClient(cfg.URL, secret.Token)
 
@@ -86,7 +87,7 @@ func main() {
 	}
 
 	log.Print("Starting planner...\n")
-	planner := planner.NewPlanner(cfg.MinimumDuration, cfg.MaximumHotkeysPerDonation)
+	planner := planner.NewPlanner(cfg.MinimumDuration, cfg.MaximumRequestsPerDonation)
 	go planner.Start()
 	log.Print("Planner started\n")
 
@@ -105,12 +106,6 @@ func main() {
 	_ = signalrClient
 
 	log.Println("signalrClient started")
-
-	/*err = c.TestDonations(228, "mrHrunDell", "Проверка донатов)", "RUB", false)
-	if err != nil {
-		log.Printf("Error: %v", err)
-		return
-	}*/
 
 	// Start the console
 	exitChan := make(chan struct{})

@@ -3,5 +3,4 @@ VTubeStudio:
   port: 14141
   url: "ws://192.168.1.37"
 minimumDuration: 2
-maximumHotkeysPerDonation: 20
-defaultHotkeyCoefficient: 2.5
+maximumRequestsPerDonation: 20
