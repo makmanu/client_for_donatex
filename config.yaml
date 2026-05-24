@@ -4,3 +4,4 @@ VTubeStudio:
   url: "ws://192.168.1.37"
 minimumDuration: 2
 maximumRequestsPerDonation: 20
+minecraft_server_RCON_enabled: true

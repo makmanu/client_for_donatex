@@ -7,6 +7,7 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/makmanu/client_for_donatex/RCON_minecraft"
 	"github.com/makmanu/client_for_donatex/client"
 	"github.com/makmanu/client_for_donatex/config"
 	"github.com/makmanu/client_for_donatex/planner"
@@ -158,7 +159,28 @@ Commands:
 			}
 			identifier := parts[1]
 			executeCmd(identifier)
-		
+
+		case "rcon":
+			if len(parts) < 2 {
+				fmt.Println("Usage: rcon <command>")
+				continue
+			}
+			command := strings.Join(parts[1:], " ")
+			rconCmd(command)
+
+		case "rconrepeat":
+			if len(parts) < 3 {
+				fmt.Println("Usage: rconrepeat <repeat> <command>")
+				continue
+			}
+			repeat, err := strconv.Atoi(parts[1])
+			if err != nil {
+				fmt.Println("Invalid repeat value, should be an number")
+				continue
+			}
+			command := strings.Join(parts[2:], " ")
+			rconrepeatCmd(command, repeat)
+
 		case "tint":
 			if len(parts) != 5 {
 				fmt.Println("Usage: tintmodel <r> <g> <b> <a>")
@@ -348,4 +370,22 @@ func selectMeshesCMD() {
 	}
 
 	fmt.Printf("✓ Selected meshes: [%s]\n", strings.Join(meshes, ", "))
+}
+
+func rconCmd(command string) {
+	response, err := RCON_minecraft.SendRCONCommand(command)
+	if err != nil {
+		fmt.Printf("Error: %v\n", err)
+		return
+	}
+	fmt.Printf("RCON response: %s\n", response)
+}
+
+func rconrepeatCmd(command string, repeat int) {
+	err := RCON_minecraft.SendRCONCommandRepeatedly(command, repeat)
+	if err != nil {
+		fmt.Printf("Error: %v\n", err)
+		return
+	}
+	fmt.Printf("✓ Sent RCON command '%s' %d times\n", command, repeat)
 }

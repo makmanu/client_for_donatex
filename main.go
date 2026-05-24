@@ -7,6 +7,7 @@ import (
 	"os"
 	"time"
 
+	"github.com/makmanu/client_for_donatex/RCON_minecraft"
 	"github.com/makmanu/client_for_donatex/client"
 	"github.com/makmanu/client_for_donatex/config"
 	"github.com/makmanu/client_for_donatex/console"
@@ -52,15 +53,31 @@ func main() {
 		return
 	}
 
-	log.Printf("Load config")
+	if cfg.MinecraftServerRCONEnabled == true {
+		if err := RCON_minecraft.SetRCONConfiguration(); err != nil {
+			fmt.Printf("Failed to set RCON configuration: %v\nRCON disabled for current session\n", err)
+			cfg.MinecraftServerRCONEnabled = false
+		}
+		err := RCON_minecraft.EstablishRCONConnection()
+		if err != nil {
+			fmt.Printf("Failed to establish RCON connection: %v\nRCON disabled for current session\n", err)
+			cfg.MinecraftServerRCONEnabled = false
+		} else {
+			defer RCON_minecraft.RCONConnection.Close()
+			fmt.Println("Successfully established RCON connection to Minecraft server")
+		}
+	} else {
+		fmt.Println("Minecraft server RCON integration is disabled in config, skipping RCON setup")
+	}
+
+	log.Printf("Config loaded")
 
 	commandList, err := config.LoadCommandList("list.yaml")
 	if err != nil {
 		log.Fatalf("Failed to load command list: %v", err)
 	}
-	log.Printf("Load command list")
+	log.Printf("Command list loaded")
 	log.Println(commandList)
-	fmt.Println(commandList.Commands["1325"].Args.Id)
 
 	c := client.NewClient(cfg.URL, secret.Token)
 

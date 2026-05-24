@@ -8,8 +8,9 @@ import (
 )
 
 var (
-	config           structs.Config
+	Config           structs.Config
 	CommandList		 *structs.CommandList
+	Secret 			 *structs.Secret
 )
 
 func LoadConfig(filename string) (*structs.Config, error) {
@@ -17,12 +18,12 @@ func LoadConfig(filename string) (*structs.Config, error) {
 	if err != nil {
 		return nil, err
 	}
-	err = yaml.Unmarshal(data, &config)
+	err = yaml.Unmarshal(data, &Config)
 	if err != nil {
 		return nil, err
 	}
 
-	return &config, nil
+	return &Config, nil
 }
 
 func LoadSecret(filename string) (*structs.Secret, error) {
@@ -30,14 +31,12 @@ func LoadSecret(filename string) (*structs.Secret, error) {
 	if err != nil {
 		return nil, err
 	}
-
-	var secret structs.Secret
-	err = yaml.Unmarshal(data, &secret)
+	err = yaml.Unmarshal(data, &Secret)
 	if err != nil {
 		return nil, err
 	}
 
-	return &secret, nil
+	return Secret, nil
 }
 
 func LoadCommandList(filename string) (*structs.CommandList, error) {

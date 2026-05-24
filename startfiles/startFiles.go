@@ -33,7 +33,11 @@ defaultHotkeyCoefficient: 2.5`), 0644)
 				return err
 			}
 		token = strings.TrimSpace(token)
-		err = os.WriteFile("secret.yaml", []byte(`token: "`+token+`"`), 0644)
+		err = os.WriteFile("secret.yaml", []byte(`token: "`+token+`"
+minecraft_server_RCON:
+  host: ""
+  port: 0
+  password: ""`), 0644)
 		log.Println("Created default secret.yaml")
 	}
 

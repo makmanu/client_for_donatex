@@ -8,6 +8,8 @@
 #     R 0-255 of red color.
 #     G 0-255 of green color.
 #     B 0-255 of blue color.
+#   Minecraft - execute command in minecraft server via RCON.
+#     In Args accepts command, that should be executed in minecraft server.
 
 
 # Example of list.yaml
@@ -64,3 +66,17 @@ Commands:
         R: 255
         G: 0
         B: 0
+  Skip_time:
+    Name: "Skip Half Day"
+    Type: "Minecraft"
+    Price: 5
+    Args:
+      RCONcommand: "time add 1000"
+      params: 1
+  Hit_with_lightning:
+    Name: "Hit with lightning"
+    Type: "Minecraft"
+    Price: 10
+    Args:
+      RCONcommand: "execute as <0> at @p run summon lightning_bolt ~ ~ ~"
+      params: 2

@@ -8,6 +8,7 @@ import (
 
 	"github.com/makmanu/client_for_donatex/config"
 	"github.com/makmanu/client_for_donatex/structs"
+	"github.com/makmanu/client_for_donatex/RCON_minecraft"
 )
 
 func GetRequestsFromMessage(message string) (map[string][]string, error) {
@@ -103,6 +104,28 @@ func HandleRequest(identifier string, args []string, money float64) (remains flo
 				}
 			}
 			return money - (float64(command.Price) * float64(seconds))
+		case "Minecraft":
+			if len(args) != command.Args.Params {
+				fmt.Printf("Invalid number of arguments for Minecraft command '%s', should be %d\n", identifier, command.Args.Params)
+				return money
+			}
+			repeat, err := strconv.Atoi(args[0])
+			if err != nil {
+				fmt.Printf("Invalid repeat value for Minecraft command '%s', skipping...\n", identifier)
+				return money
+			}
+			if float64(command.Price) * float64(repeat) > money {
+				fmt.Printf("Not enough money for Minecraft command '%s': need %.2f RUB but only %.2f RUB available, skipping...\n", identifier, float64(command.Price) * float64(repeat), money)
+				return money
+			}
+			preparedRCONCommand := RCON_minecraft.PrepareRCONCommand(command.Args.RCONcommand, args[1:])
+			err = RCON_minecraft.SendRCONCommandRepeatedly(preparedRCONCommand, repeat)
+			if err != nil {
+				fmt.Printf("Error sending RCON command for '%s': %v\n", identifier, err)
+				return money
+			}
+			return money - (float64(command.Price) * float64(repeat))
+
 		default:
 			fmt.Printf("Unknown command type '%s' for command '%s', skipping...\n", command.Type, identifier)
 			return money

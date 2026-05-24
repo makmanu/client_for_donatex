@@ -13,6 +13,7 @@ type Config struct {
 	VTubeStudio                VTubeStudioConfig `yaml:"VTubeStudio"`
 	MinimumDuration            int               `yaml:"minimumDuration"`
 	MaximumRequestsPerDonation int               `yaml:"maximumRequestsPerDonation"`
+	MinecraftServerRCONEnabled bool              `yaml:"minecraft_server_RCON_enabled"`
 }
 
 type Secret struct {
@@ -83,8 +84,9 @@ type Command struct {
 }
 
 type CommandArgs struct {
-	Tags []string `yaml:"Tags,omitempty"`
-	Id   string   `yaml:"Id,omitempty"`
+	RCONcommand string      `yaml:"RCONcommand,omitempty"`
+	Params int              `yaml:"Params,omitempty"`
+	Id   string             `yaml:"Id,omitempty"`
 	Colors map[string]Color `yaml:",inline"`
 }
 
