@@ -227,7 +227,7 @@ func executeCmd(identifier string) {
 		}
 	case "Tint":
 		for colorName, color := range command.Args.Colors {
-			err := plugin.TintMeshesFadeIn(255, 255, 255, color.R, color.G, color.B, color.ListOfMeshes)
+			err := plugin.TintMeshesFadeIn(255, 255, 255, color.R, color.G, color.B, 1, color.ListOfMeshes)
 			if err != nil {
 				fmt.Printf("Error executing tint for color '%s': %v\n", colorName, err)
 			} else {
@@ -328,7 +328,7 @@ func tintMeshesCMD(r, g, b int, meshes []string){
 }
 
 func tintMeshesFadeInCMD(R, G, B, Rnew, Gnew, Bnew int, meshes []string){
-	err := plugin.TintMeshesFadeIn(R, G, B, Rnew, Gnew, Bnew, meshes)
+	err := plugin.TintMeshesFadeIn(R, G, B, Rnew, Gnew, Bnew, 1, meshes)
 	if err != nil {
 		fmt.Printf("Error: %v\n", err)
 		return

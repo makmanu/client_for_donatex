@@ -161,13 +161,13 @@ func (p *Planner) RemoveHotkeyFromSchedule(name string) error {
 func (p *Planner) AddTintToSchedule(name string, r, g, b int, seconds int, meshes []string) error {
 	item := &structs.ScheduleItem{
 		Name: name,
-		ArgsforExecute: []any{r, g, b, meshes},
-		ArgsforStop:    []any{r, g, b, meshes},
+		ArgsforExecute: []any{r, g, b, 1, meshes},
+		ArgsforStop:    []any{r, g, b, 0, meshes},
 		FunctionToExecute: func(args ...any) error {
-			return plugin.TintMeshesFadeIn(255, 255, 255, args[0].(int), args[1].(int), args[2].(int), args[3].([]string))
+			return plugin.TintMeshesFadeIn(255, 255, 255, args[0].(int), args[1].(int), args[2].(int), args[3].(int), args[4].([]string))
 		},
 		FunctionToStop: func(args ...any) error {
-			return plugin.TintMeshesFadeIn(args[0].(int), args[1].(int), args[2].(int), 255, 255, 255, args[3].([]string))
+			return plugin.TintMeshesFadeIn(args[0].(int), args[1].(int), args[2].(int), 255, 255, 255, args[3].(int), args[4].([]string))
 		},
 		DurationinSeconds: seconds,
 		ExpiresAt: time.Now(),

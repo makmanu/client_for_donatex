@@ -16,7 +16,14 @@ type Config struct {
 }
 
 type Secret struct {
-	Token         string `yaml:"token"`
+	Token         string                     `yaml:"token"`
+	MinecraftRCON minecraftServerRCONConfig  `yaml:"minecraft_server_RCON"`
+}
+
+type minecraftServerRCONConfig struct {
+	Host     string `yaml:"host"`
+	Port     int    `yaml:"port"`
+	Password string `yaml:"password"`
 }
 
 type Hotkey struct {
