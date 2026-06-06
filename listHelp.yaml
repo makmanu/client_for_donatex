@@ -73,10 +73,11 @@ Commands:
     Args:
       RCONcommand: "time add 1000"
       params: 1
-  Hit_with_lightning:
-    Name: "Hit with lightning"
+  minecraft_lightning:
+    Name: "minecraft_lightning"
     Type: "Minecraft"
     Price: 10
     Args:
-      RCONcommand: "execute as <0> at @p run summon lightning_bolt ~ ~ ~"
+      RCONcommand: "/execute as <1> at @s run summon lightning_bolt ~ ~ ~"
+      Announce: "Summoning <2> lightnings at <1> location!"
       params: 2

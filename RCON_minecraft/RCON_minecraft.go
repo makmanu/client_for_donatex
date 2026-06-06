@@ -99,7 +99,7 @@ func SendRCONCommand(command string) (string, error) {
 
 func PrepareRCONCommand(command string, args []string) string {
 	for i, arg := range args {
-		command = strings.Replace(command, fmt.Sprintf("<%d>", i), arg, 1)
+		command = strings.Replace(command, fmt.Sprintf("<%d>", i + 1), arg, 1)
 	}
 	return command
 }

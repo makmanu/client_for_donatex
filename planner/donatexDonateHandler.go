@@ -118,6 +118,12 @@ func HandleRequest(identifier string, args []string, money float64) (remains flo
 				fmt.Printf("Not enough money for Minecraft command '%s': need %.2f RUB but only %.2f RUB available, skipping...\n", identifier, float64(command.Price) * float64(repeat), money)
 				return money
 			}
+			preparedRCONAnnounce := RCON_minecraft.PrepareRCONCommand(command.Args.Announce, args[1:])
+			err = RCON_minecraft.SendRCONCommandRepeatedly(preparedRCONAnnounce, 1)
+			if err != nil {
+				fmt.Printf("Error sending RCON command for '%s': %v\n", identifier, err)
+				return money
+			}
 			preparedRCONCommand := RCON_minecraft.PrepareRCONCommand(command.Args.RCONcommand, args[1:])
 			err = RCON_minecraft.SendRCONCommandRepeatedly(preparedRCONCommand, repeat)
 			if err != nil {

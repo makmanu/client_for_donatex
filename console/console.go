@@ -24,6 +24,8 @@ Commands:
   tint <r> <g> <b> <a>                            - Tint model with specified RGBA color
   tintmeshes <r> <g> <b> <a> <mesh1> <mesh2>...   - Tint, but for choosed meshes
   tintmeshesfadein <use command to know>          - Tintmeshes, but with animation 
+  rconrepeat <times> <command>                    - Send RCON command to Minecraft server multiple times
+  rcon <command>                                  - Send RCON command to Minecraft server
   reqmeshes                                       - Get info about curent model meshes
   getdonations <skip> <take> <hideTest>           - Get donations with pagination and test donation filter
   update                                          - Update current hotkeys from VTubeStudio

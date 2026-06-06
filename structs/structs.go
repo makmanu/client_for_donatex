@@ -85,6 +85,7 @@ type Command struct {
 
 type CommandArgs struct {
 	RCONcommand string      `yaml:"RCONcommand,omitempty"`
+	Announce    string      `yaml:"Announce,omitempty"`
 	Params int              `yaml:"Params,omitempty"`
 	Id   string             `yaml:"Id,omitempty"`
 	Colors map[string]Color `yaml:",inline"`
