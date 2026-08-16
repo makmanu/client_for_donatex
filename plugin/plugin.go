@@ -446,7 +446,7 @@ func absInt(x int) int {
 	return x
 }
 
-func TintMeshesFadeIn(R, G, B, Rnew, Gnew, Bnew, env int, meshes []string) error{
+func TintMeshesFadeIn(R, G, B, A, Rnew, Gnew, Bnew, Anew, env int, meshes []string) error{
 	if conn == nil {
 		return fmt.Errorf("websocket connection must not be nil")
 	}
@@ -454,7 +454,8 @@ func TintMeshesFadeIn(R, G, B, Rnew, Gnew, Bnew, env int, meshes []string) error
 	Rsign := 5
 	Gsign := 5
 	Bsign := 5
-	for absInt(R - Rnew) > 5 || absInt(G - Gnew) > 5 || absInt(B - Bnew) > 5 || oldEnv - float64(env) > 0.1 {
+	Asign := 5
+	for absInt(R - Rnew) > 5 || absInt(G - Gnew) > 5 || absInt(B - Bnew) > 5 || absInt(A - Anew) > 5 || oldEnv - float64(env) > 0.1 {
 		if absInt(R - Rnew) > 5 {
 			R += Rsign
 			if R > 255 {
@@ -488,6 +489,17 @@ func TintMeshesFadeIn(R, G, B, Rnew, Gnew, Bnew, env int, meshes []string) error
 				Bsign = 5
 			}
 		}
+		if absInt(A - Anew) > 5 {
+			A += Asign
+			if A > 255 {
+				A = 254
+				Asign = -5
+			}
+			if A < 0 {
+				A = 1
+				Asign = 5
+			}
+		}
 		if oldEnv - float64(env) > 0.01 {
 			oldEnv -= 0.05
 		}
@@ -501,7 +513,7 @@ func TintMeshesFadeIn(R, G, B, Rnew, Gnew, Bnew, env int, meshes []string) error
 					"colorR": R,
 					"colorG": G,
 					"colorB": B,
-					"colorA": 255,
+					"colorA": A,
 					"mixWithSceneLightingColor": oldEnv,
 				},
 				"artMeshMatcher": map[string]any{
