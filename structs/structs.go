@@ -96,6 +96,7 @@ type Color struct {
 	R            int      `yaml:"R"`
 	G            int      `yaml:"G"`
 	B            int      `yaml:"B"`
+	A            int      `yaml:"A"`
 }
 
 type CommandList struct {

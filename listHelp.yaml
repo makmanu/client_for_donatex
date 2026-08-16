@@ -8,6 +8,7 @@
 #     R 0-255 of red color.
 #     G 0-255 of green color.
 #     B 0-255 of blue color.
+#     A 0-255 of transparency.
 #   Minecraft - execute command in minecraft server via RCON.
 #     In Args accepts command, that should be executed in minecraft server.
 
@@ -36,6 +37,7 @@ Commands:
         R: 255
         G: 0
         B: 0
+        A: 255
   Bee_hair:
     Name: "Bee hair"
     Type: "Tint"
@@ -46,11 +48,13 @@ Commands:
         R: 0
         G: 0
         B: 0
+        A: 255
       Yellow:
         ListOfMeshes: ["ArtMesh114", "ArtMesh123"]
         R: 255
         G: 255
         B: 0
+        A: 255
   Black_red_hair:
     Name: "Black red hair"
     Type: "Tint"
@@ -61,11 +65,13 @@ Commands:
         R: 0
         G: 0
         B: 0
+        A: 255
       Red:
         ListOfMeshes: ["ArtMesh114", "ArtMesh123"]
         R: 255
         G: 0
         B: 0
+        A: 255
   Skip_time:
     Name: "Skip Half Day"
     Type: "Minecraft"
