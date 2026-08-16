@@ -266,7 +266,7 @@ func executeCmd(identifier string) {
 		}
 	case "Tint":
 		for colorName, color := range command.Args.Colors {
-			err := plugin.TintMeshesFadeIn(255, 255, 255, 255, color.R, color.G, color.B, 255, 1, color.ListOfMeshes)
+			err := plugin.TintMeshesFadeIn(255, 255, 255, 255, color.R, color.G, color.B, color.A, 1, color.ListOfMeshes)
 			if err != nil {
 				fmt.Printf("Error executing tint for color '%s': %v\n", colorName, err)
 			} else {
@@ -316,7 +316,7 @@ func executetimeCmd(identifier string, time string) {
 		}
 	case "Tint":
 		for colorName, color := range command.Args.Colors {
-			err = planner.DefaultPlanner.AddTintToSchedule(colorName, color.R, color.G, color.B, time_in_seconds, color.ListOfMeshes)
+			err = planner.DefaultPlanner.AddTintToSchedule(colorName, color.R, color.G, color.B, color.A, time_in_seconds, color.ListOfMeshes)
 			if err != nil {
 				fmt.Printf("Error: %v\n", err)
 				return

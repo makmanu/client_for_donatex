@@ -54,6 +54,7 @@ minecraft_server_RCON:
 #     R 0-255 of red color.
 #     G 0-255 of green color.
 #     B 0-255 of blue color.
+#     A 0-255 of transparency.
 
 
 # Example of list.yaml
@@ -80,6 +81,7 @@ Commands:
         R: 255
         G: 0
         B: 0
+        A: 255
   Bee_hair:
     Name: "Bee hair"
     Type: "Tint"
@@ -90,11 +92,13 @@ Commands:
         R: 0
         G: 0
         B: 0
+        A: 255
       Yellow:
         ListOfMeshes: ["ArtMesh114", "ArtMesh123"]
         R: 255
         G: 255
         B: 0
+        A: 255
   Black_red_hair:
     Name: "Black red hair"
     Type: "Tint"
@@ -105,11 +109,13 @@ Commands:
         R: 0
         G: 0
         B: 0
+        A: 255
       Red:
         ListOfMeshes: ["ArtMesh114", "ArtMesh123"]
         R: 255
         G: 0
-        B: 0`), 0644)
+        B: 0
+        A: 255`), 0644)
 		if err != nil {
 			return err
 		}
@@ -141,6 +147,7 @@ Commands:
         R: 255
         G: 0
         B: 0
+        A: 255
   Bee_hair:
     Name: "Bee hair"
     Type: "Tint"
@@ -151,11 +158,13 @@ Commands:
         R: 0
         G: 0
         B: 0
+        A: 255
       Yellow:
         ListOfMeshes: ["ArtMesh114", "ArtMesh123"]
         R: 255
         G: 255
         B: 0
+        A: 255
   Black_red_hair:
     Name: "Black red hair"
     Type: "Tint"
@@ -166,11 +175,13 @@ Commands:
         R: 0
         G: 0
         B: 0
+        A: 255
       Red:
         ListOfMeshes: ["ArtMesh114", "ArtMesh123"]
         R: 255
         G: 0
-        B: 0`), 0644)
+        B: 0
+        A: 255`), 0644)
     if err != nil {
       return err
     }
