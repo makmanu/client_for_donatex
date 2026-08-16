@@ -70,8 +70,8 @@ Commands:
 			selectMeshesCMD()
 
 		case "tintmeshes":
-			if len(parts) < 4 {
-				fmt.Println("Usage: tintmeshes <r> <g> <b> <mesh1> <mesh2>...")
+			if len(parts) < 5 {
+				fmt.Println("Usage: tintmeshes <r> <g> <b> <a> <mesh1> <mesh2>...")
 				continue
 			}
 			r, err := strconv.Atoi(parts[1])
@@ -89,9 +89,14 @@ Commands:
 				fmt.Println("Invalid b value, should be an integer")
 				continue
 			}
+			a, err := strconv.Atoi(parts[4])
+			if err != nil {
+				fmt.Println("Invalid b value, should be an integer")
+				continue
+			}
 
-			meshes := parts[5:]
-			tintMeshesCMD(r, g, b, meshes)
+			meshes := parts[6:]
+			tintMeshesCMD(r, g, b, a, meshes)
 
 		case "tintmeshesfadein":
 			if len(parts) < 9 {
@@ -341,8 +346,8 @@ func reqMeshesCMD() {
 	}
 }
 
-func tintMeshesCMD(r, g, b int, meshes []string){
-	err := plugin.TintMeshes(r, g, b, meshes)
+func tintMeshesCMD(r, g, b, a int, meshes []string){
+	err := plugin.TintMeshes(r, g, b, a, meshes)
 	if err != nil {
 		fmt.Printf("Error: %v\n", err)
 		return

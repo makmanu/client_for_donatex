@@ -367,7 +367,7 @@ func TintModel(R, G, B, A int) error {
 	return nil
 }
 
-func TintMeshes(R, G, B int, meshes []string) error {
+func TintMeshes(R, G, B, A int, meshes []string) error {
 	if conn == nil {
 		return fmt.Errorf("websocket connection must not be nil")
 	}
@@ -382,7 +382,7 @@ func TintMeshes(R, G, B int, meshes []string) error {
 				"colorR": R,
 				"colorG": G,
 				"colorB": B,
-				"colorA": 255,
+				"colorA": A,
 				"mixWithSceneLightingColor": 0.5,
 			},
 			"artMeshMatcher": map[string]any{
