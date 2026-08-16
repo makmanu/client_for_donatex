@@ -70,8 +70,8 @@ Commands:
 			selectMeshesCMD()
 
 		case "tintmeshes":
-			if len(parts) < 4 {
-				fmt.Println("Usage: tintmeshes <r> <g> <b> <mesh1> <mesh2>...")
+			if len(parts) < 5 {
+				fmt.Println("Usage: tintmeshes <r> <g> <b> <a> <mesh1> <mesh2>...")
 				continue
 			}
 			r, err := strconv.Atoi(parts[1])
@@ -87,15 +87,20 @@ Commands:
 			b, err := strconv.Atoi(parts[3])
 			if err != nil {
 				fmt.Println("Invalid b value, should be an integer")
+				continue
+			}
+			a, err := strconv.Atoi(parts[4])
+			if err != nil {
+				fmt.Println("Invalid a value, should be an integer")
 				continue
 			}
 
 			meshes := parts[5:]
-			tintMeshesCMD(r, g, b, meshes)
+			tintMeshesCMD(r, g, b, a, meshes)
 
 		case "tintmeshesfadein":
 			if len(parts) < 9 {
-				fmt.Println("Usage: tintmeshesfadein <r> <g> <b> <rnew> <gnew> <bnew> <mesh1> <mesh2>...")
+				fmt.Println("Usage: tintmeshesfadein <r> <g> <b> <a> <rnew> <gnew> <bnew> <anew> <mesh1> <mesh2>...")
 				continue
 			}
 			r, err := strconv.Atoi(parts[1])
@@ -111,6 +116,11 @@ Commands:
 			b, err := strconv.Atoi(parts[3])
 			if err != nil {
 				fmt.Println("Invalid b value, should be an integer")
+				continue
+			}
+			a, err := strconv.Atoi(parts[4])
+			if err != nil {
+				fmt.Println("Invalid a value, should be an integer")
 				continue
 			}
 			rnew, err := strconv.Atoi(parts[5])
@@ -128,9 +138,14 @@ Commands:
 				fmt.Println("Invalid b value, should be an integer")
 				continue
 			}
+			anew, err := strconv.Atoi(parts[8])
+			if err != nil {
+				fmt.Println("Invalid b value, should be an integer")
+				continue
+			}
 
 			meshes := parts[9:]
-			go tintMeshesFadeInCMD(r, g, b, rnew, gnew, bnew, meshes)
+			go tintMeshesFadeInCMD(r, g, b, a, rnew, gnew, bnew, anew, meshes)
 
 		case "getdonations":
 			if len(parts) != 4 {
@@ -251,7 +266,7 @@ func executeCmd(identifier string) {
 		}
 	case "Tint":
 		for colorName, color := range command.Args.Colors {
-			err := plugin.TintMeshesFadeIn(255, 255, 255, color.R, color.G, color.B, 1, color.ListOfMeshes)
+			err := plugin.TintMeshesFadeIn(255, 255, 255, 255, color.R, color.G, color.B, 255, 1, color.ListOfMeshes)
 			if err != nil {
 				fmt.Printf("Error executing tint for color '%s': %v\n", colorName, err)
 			} else {
@@ -341,24 +356,24 @@ func reqMeshesCMD() {
 	}
 }
 
-func tintMeshesCMD(r, g, b int, meshes []string){
-	err := plugin.TintMeshes(r, g, b, meshes)
+func tintMeshesCMD(r, g, b, a int, meshes []string){
+	err := plugin.TintMeshes(r, g, b, a, meshes)
 	if err != nil {
 		fmt.Printf("Error: %v\n", err)
 		return
 	}
 
-	fmt.Printf("✓ Tinted some meshes with color RGBA(%d, %d, %d, %d)\n", r, g, b, 255)
+	fmt.Printf("✓ Tinted some meshes with color RGBA(%d, %d, %d, %d)\n", r, g, b, a)
 }
 
-func tintMeshesFadeInCMD(R, G, B, Rnew, Gnew, Bnew int, meshes []string){
-	err := plugin.TintMeshesFadeIn(R, G, B, Rnew, Gnew, Bnew, 1, meshes)
+func tintMeshesFadeInCMD(R, G, B, A, Rnew, Gnew, Bnew, Anew int, meshes []string){
+	err := plugin.TintMeshesFadeIn(R, G, B, A, Rnew, Gnew, Bnew, Anew, 1, meshes)
 	if err != nil {
 		fmt.Printf("Error: %v\n", err)
 		return
 	}
 
-	fmt.Printf("✓ Tinted meshes with animation and color RGBA(%d, %d, %d, %d)\n", R, G, B, 255)
+	fmt.Printf("✓ Tinted meshes with animation and color RGBA(%d, %d, %d, %d)\n", R, G, B, A)
 }
 
 func selectMeshesCMD() {
